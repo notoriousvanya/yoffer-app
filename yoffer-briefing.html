@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Новая вакансия</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; cursor: pointer; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+  .btn-cancel { padding: 8px 18px; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: transparent; border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; text-decoration: none; display: inline-block; }
+  .btn-cancel:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+
+  /* PROGRESS BAR */
+  .progress-bar {
+    position: sticky; top: 64px; z-index: 49;
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 56px;
+    display: flex; align-items: center; gap: 0;
+  }
+  .step {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; color: var(--text-muted);
+    cursor: default; padding: 0 4px;
+  }
+  .step.active { color: var(--purple); }
+  .step.done { color: var(--success); }
+  .step-num {
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 800;
+    background: var(--bg); border: 2px solid var(--border); color: var(--text-muted);
+    flex-shrink: 0; transition: all .3s;
+  }
+  .step.active .step-num { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .step.done .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; min-width: 32px; transition: background .3s; }
+  .step-line.done { background: var(--success); }
+
+  /* PAGE */
+  .page { flex: 1; display: flex; align-items: flex-start; justify-content: center; padding: 48px 24px 80px; }
+  .card { background: var(--white); border: 1.5px solid var(--border); border-radius: 24px; padding: 44px 48px; width: 100%; max-width: 680px; animation: fadeUp .4s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+
+  .card-tag { font-size: 12px; font-weight: 700; color: var(--purple); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 10px; }
+  .card-title { font-size: 26px; font-weight: 800; letter-spacing: -.7px; margin-bottom: 6px; }
+  .card-sub { font-size: 15px; color: var(--text-secondary); font-weight: 500; margin-bottom: 36px; line-height: 1.6; }
+
+  /* FORM FIELDS */
+  .form-group { margin-bottom: 24px; }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; }
+  .label-hint { font-size: 12px; font-weight: 500; color: var(--text-muted); margin-left: 6px; }
+  input[type=text] {
+    width: 100%; padding: 13px 16px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-size: 15px; font-family: 'Manrope',sans-serif; font-weight: 500;
+    color: var(--text-primary); outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  input[type=text]::placeholder { color: var(--text-muted); }
+  input[type=text]:focus { border-color: var(--purple); box-shadow: 0 0 0 4px rgba(107,78,255,.1); }
+  input[type=text].error { border-color: #EF4444; }
+
+  /* GOAL OPTIONS */
+  .goal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .goal-card {
+    border: 1.5px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; cursor: pointer; transition: all .18s;
+    background: var(--white); display: flex; align-items: flex-start; gap: 12px;
+  }
+  .goal-card:hover { border-color: var(--purple-mid); background: var(--purple-soft); }
+  .goal-card.selected { border-color: var(--purple); background: var(--purple-soft); }
+  .goal-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .goal-name { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .goal-card.selected .goal-name { color: var(--purple); }
+  .goal-desc { font-size: 12px; color: var(--text-secondary); font-weight: 500; line-height: 1.4; }
+
+  /* URGENCY SLIDER */
+  .urgency-options { display: flex; gap: 8px; }
+  .urgency-btn {
+    flex: 1; padding: 11px 8px; border-radius: 12px; text-align: center;
+    border: 1.5px solid var(--border); background: var(--white);
+    cursor: pointer; transition: all .18s;
+  }
+  .urgency-btn:hover { border-color: var(--purple-mid); }
+  .urgency-btn.selected { border-color: var(--purple); background: var(--purple-soft); }
+  .urgency-btn.selected .u-label { color: var(--purple); }
+  .urgency-btn.hot { border-color: #FCA5A5; }
+  .urgency-btn.hot.selected { border-color: #EF4444; background: #FEF2F2; }
+  .urgency-btn.hot.selected .u-label { color: #EF4444; }
+  .u-emoji { font-size: 18px; display: block; margin-bottom: 4px; }
+  .u-label { font-size: 13px; font-weight: 700; display: block; }
+  .u-sub { font-size: 11px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px; }
+
+  /* ROLE INFO BANNER */
+  .role-banner {
+    background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
+    border-radius: 12px; padding: 12px 16px;
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 28px;
+  }
+  .role-banner-icon { font-size: 18px; }
+  .role-banner p { font-size: 13px; color: var(--purple); font-weight: 600; }
+  .role-banner a { color: var(--purple); text-decoration: underline; cursor: pointer; }
+
+  /* ACTIONS */
+  .card-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 36px; gap: 12px; }
+  .btn-back { padding: 13px 24px; border-radius: 12px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: transparent; border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-back:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+  .btn-next { padding: 13px 36px; border-radius: 12px; font-size: 15px; font-weight: 700; font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple); border: none; cursor: pointer; transition: all .25s; box-shadow: 0 4px 16px rgba(107,78,255,.28); }
+  .btn-next:hover { background: var(--purple-light); transform: translateY(-1px); }
+  .btn-next:disabled { opacity: .45; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* ── STEP 2: MODE SELECTION ── */
+  .mode-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+  .mode-card {
+    border: 2px solid var(--border); border-radius: 18px;
+    padding: 24px 22px; cursor: pointer; transition: all .2s;
+    background: var(--white); position: relative; overflow: hidden;
+  }
+  .mode-card::after {
+    content: ''; position: absolute; top: 0; right: 0;
+    width: 80px; height: 80px; border-radius: 0 18px 0 100%;
+    background: var(--purple-soft); opacity: 0; transition: opacity .2s;
+  }
+  .mode-card:hover { border-color: var(--purple-mid); }
+  .mode-card:hover::after { opacity: .6; }
+  .mode-card.selected { border-color: var(--purple); background: linear-gradient(135deg,#FAFAFF,#F0EDFF); }
+  .mode-card.selected::after { opacity: 1; }
+  .mode-check {
+    position: absolute; top: 14px; right: 14px; z-index: 1;
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); background: var(--white);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; font-size: 11px;
+  }
+  .mode-card.selected .mode-check { border-color: var(--purple); background: var(--purple); color: #fff; }
+  .mode-icon { font-size: 28px; margin-bottom: 12px; display: block; }
+  .mode-title { font-size: 17px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.3px; }
+  .mode-card.selected .mode-title { color: var(--purple); }
+  .mode-desc { font-size: 13px; color: var(--text-secondary); font-weight: 500; line-height: 1.6; }
+  .mode-rec {
+    display: inline-block; margin-top: 12px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .mode-rec.purple { background: var(--purple); color: #fff; }
+  .mode-rec.gray { background: var(--bg); color: var(--text-muted); }
+
+  .combine-hint {
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 14px 18px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .combine-hint-icon { font-size: 18px; flex-shrink: 0; }
+  .combine-hint p { font-size: 13px; color: var(--text-secondary); font-weight: 500; line-height: 1.6; }
+  .combine-hint strong { color: var(--text-primary); font-weight: 700; }
+
+  /* SCREEN TRANSITIONS */
+  .screen { display: none; }
+  .screen.active { display: block; animation: fadeUp .35s ease both; }
+
+  @media(max-width:700px){
+    nav{padding:0 20px} .progress-bar{padding:0 20px;overflow-x:auto}
+    .card{padding:28px 24px} .goal-grid{grid-template-columns:1fr} .mode-grid{grid-template-columns:1fr}
+    .urgency-options{flex-wrap:wrap}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo" href="yoffer-dashboard.html">YOFFER</a>
+  <div class="nav-right">
+    <a href="yoffer-dashboard.html" class="btn-cancel">Отмена</a>
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar" id="progress-bar">
+  <div class="step active" id="s1">
+    <div class="step-num">1</div>
+    <span>Брифинг</span>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step" id="s2">
+    <div class="step-num">2</div>
+    <span>Режим</span>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step" id="s3">
+    <div class="step-num">3</div>
+    <span>Интервью с ИИ</span>
+  </div>
+  <div class="step-line" id="line3"></div>
+  <div class="step" id="s4">
+    <div class="step-num">4</div>
+    <span>Профиль готов</span>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- ── SCREEN 1: BRIEFING ── -->
+  <div class="card screen active" id="screen-1">
+
+    <div class="card-tag">Шаг 1 из 4</div>
+    <h1 class="card-title">Расскажите о вакансии</h1>
+    <p class="card-sub">Два вопроса — и ИИ настроится под ваш запрос. Название роли уточним в диалоге.</p>
+
+    <!-- Role banner -->
+    <div class="role-banner">
+      <div class="role-banner-icon" id="role-banner-icon">👨‍💻</div>
+      <p>Вы входите как <strong id="role-banner-label">Руководитель отдела</strong> — <span id="role-banner-desc">ИИ будет задавать вопросы про команду и задачи.</span> <a onclick="changeRole()">Изменить роль</a></p>
+    </div>
+
+    <!-- Goal -->
+    <div class="form-group">
+      <label>Главная цель найма</label>
+      <div class="goal-grid">
+        <div class="goal-card" onclick="selectGoal(this, 'debt')">
+          <div class="goal-icon">🔧</div>
+          <div>
+            <div class="goal-name">Закрыть технический долг</div>
+            <div class="goal-desc">Накопились задачи, которые некому делать</div>
+          </div>
+        </div>
+        <div class="goal-card" onclick="selectGoal(this, 'product')">
+          <div class="goal-icon">🚀</div>
+          <div>
+            <div class="goal-name">Запустить новый продукт</div>
+            <div class="goal-desc">Нужен человек под новое направление</div>
+          </div>
+        </div>
+        <div class="goal-card" onclick="selectGoal(this, 'team')">
+          <div class="goal-icon">💪</div>
+          <div>
+            <div class="goal-name">Усилить команду</div>
+            <div class="goal-desc">Команда растёт, нужны новые руки</div>
+          </div>
+        </div>
+        <div class="goal-card" onclick="selectGoal(this, 'replace')">
+          <div class="goal-icon">🔄</div>
+          <div>
+            <div class="goal-name">Заменить ушедшего</div>
+            <div class="goal-desc">Освободилась позиция, нужна замена</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Urgency -->
+    <div class="form-group" style="margin-bottom:0">
+      <label>Срочность</label>
+      <div class="urgency-options">
+        <div class="urgency-btn hot" onclick="selectUrgency(this, 'asap')">
+          <span class="u-emoji">🔥</span>
+          <span class="u-label">Горит</span>
+          <span class="u-sub">До 2 недель</span>
+        </div>
+        <div class="urgency-btn" onclick="selectUrgency(this, 'month')">
+          <span class="u-emoji">⚡</span>
+          <span class="u-label">Срочно</span>
+          <span class="u-sub">~1 месяц</span>
+        </div>
+        <div class="urgency-btn selected" onclick="selectUrgency(this, 'quarter')">
+          <span class="u-emoji">📅</span>
+          <span class="u-label">Планово</span>
+          <span class="u-sub">2–3 месяца</span>
+        </div>
+        <div class="urgency-btn" onclick="selectUrgency(this, 'flex')">
+          <span class="u-emoji">🌱</span>
+          <span class="u-label">Не горит</span>
+          <span class="u-sub">Нет дедлайна</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <a href="yoffer-dashboard.html" class="btn-back">← Назад</a>
+      <button class="btn-next" id="btn-step1" onclick="goToStep2()" disabled>Продолжить →</button>
+    </div>
+  </div>
+
+  <!-- ── SCREEN 2: MODE SELECTION ── -->
+  <div class="card screen" id="screen-2">
+
+    <div class="card-tag">Шаг 2 из 4</div>
+    <h1 class="card-title">Как вам удобнее?</h1>
+    <p class="card-sub">Выберите формат диалога с ИИ — оба ведут к одному результату</p>
+
+    <div class="mode-grid">
+      <div class="mode-card selected" id="mode-task" onclick="selectMode('task')">
+        <div class="mode-check">✓</div>
+        <span class="mode-icon">💬</span>
+        <div class="mode-title">Описать задачу</div>
+        <div class="mode-desc">Расскажите о ситуации своими словами — ИИ сам задаст уточняющие вопросы и выведет профиль из контекста</div>
+        <span class="mode-rec purple">Рекомендуем для вас</span>
+      </div>
+      <div class="mode-card" id="mode-criteria" onclick="selectMode('criteria')">
+        <div class="mode-check"></div>
+        <span class="mode-icon">📋</span>
+        <div class="mode-title">Заполнить по критериям</div>
+        <div class="mode-desc">ИИ проведёт структурированный опрос по блокам: навыки, опыт, личность и условия</div>
+        <span class="mode-rec gray">Подходит для HR</span>
+      </div>
+    </div>
+
+    <div class="combine-hint">
+      <div class="combine-hint-icon">💡</div>
+      <p><strong>Можно совместить:</strong> начните с описания задачи — ИИ сформирует черновик профиля, затем предложит уточнить незаполненные блоки. Итоговый профиль будет точнее.</p>
+    </div>
+
+    <div class="card-actions">
+      <button class="btn-back" onclick="goToStep1()">← Назад</button>
+      <button class="btn-next" onclick="goToInterview()">Начать интервью →</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+let selectedGoal = null;
+let selectedUrgency = 'quarter';
+let selectedMode = 'task';
+
+// Step 1 validation
+function checkStep1() {
+  const btn = document.getElementById('btn-step1');
+  btn.disabled = !selectedGoal;
+}
+
+function selectGoal(el, goal) {
+  document.querySelectorAll('.goal-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedGoal = goal;
+  checkStep1();
+}
+
+function selectUrgency(el, val) {
+  document.querySelectorAll('.urgency-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedUrgency = val;
+}
+
+function changeRole() {
+  alert('В реальном приложении — редирект в настройки аккаунта');
+}
+
+// Step 2 mode
+function selectMode(mode) {
+  selectedMode = mode;
+  document.getElementById('mode-task').classList.toggle('selected', mode === 'task');
+  document.getElementById('mode-criteria').classList.toggle('selected', mode === 'criteria');
+  document.querySelectorAll('.mode-check').forEach((el, i) => {
+    el.textContent = (i === 0 && mode === 'task') || (i === 1 && mode === 'criteria') ? '✓' : '';
+  });
+}
+
+// Navigation
+function goToStep2() {
+  document.getElementById('screen-1').classList.remove('active');
+  document.getElementById('screen-2').classList.add('active');
+  // Update progress
+  document.getElementById('s1').classList.remove('active');
+  document.getElementById('s1').classList.add('done');
+  document.getElementById('s1').querySelector('.step-num').textContent = '✓';
+  document.getElementById('line1').classList.add('done');
+  document.getElementById('s2').classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToStep1() {
+  document.getElementById('screen-2').classList.remove('active');
+  document.getElementById('screen-1').classList.add('active');
+  document.getElementById('s1').classList.add('active');
+  document.getElementById('s1').classList.remove('done');
+  document.getElementById('s1').querySelector('.step-num').textContent = '1';
+  document.getElementById('line1').classList.remove('done');
+  document.getElementById('s2').classList.remove('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goToInterview() {
+  window.location.href = 'yoffer-interview.html';
+}
+
+// Load role from localStorage
+(function() {
+  const roleMap = {
+    hr:      { icon: '👩‍💼', label: 'HR-специалист',       desc: 'ИИ будет задавать вопросы про требования и процесс найма.' },
+    manager: { icon: '👨‍💻', label: 'Руководитель отдела', desc: 'ИИ будет задавать вопросы про команду и задачи.' },
+    owner:   { icon: '🏢',  label: 'Владелец компании',    desc: 'ИИ будет задавать вопросы про бизнес и стратегию найма.' },
+  };
+  const role = localStorage.getItem('yoffer_role') || 'manager';
+  const r = roleMap[role] || roleMap.manager;
+  document.getElementById('role-banner-icon').textContent = r.icon;
+  document.getElementById('role-banner-label').textContent = r.label;
+  document.getElementById('role-banner-desc').textContent = r.desc;
+})();
+
+</script>
+</body>
+</html>

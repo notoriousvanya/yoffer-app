@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Настройки</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+    --error: #EF4444;
+    --error-bg: #FEF2F2;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: all .18s; cursor: pointer; border: none; background: none; font-family: 'Manrope',sans-serif; }
+  .nav-link:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-link.active { color: var(--purple); background: var(--purple-soft); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+
+  /* LAYOUT */
+  .page { max-width: 900px; margin: 0 auto; padding: 40px 48px 100px; display: grid; grid-template-columns: 200px 1fr; gap: 28px; align-items: start; }
+
+  /* SIDEBAR */
+  .settings-nav { position: sticky; top: 84px; }
+  .settings-nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 14px; border-radius: 11px; font-size: 14px; font-weight: 600;
+    color: var(--text-secondary); cursor: pointer; transition: all .18s;
+    border: none; background: none; font-family: 'Manrope',sans-serif;
+    width: 100%; text-align: left; margin-bottom: 2px;
+  }
+  .settings-nav-item:hover { background: var(--white); color: var(--text-primary); }
+  .settings-nav-item.active { background: var(--purple-soft); color: var(--purple); }
+  .settings-nav-item .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+
+  /* SECTIONS */
+  .settings-content { display: flex; flex-direction: column; gap: 20px; }
+  .settings-section {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; overflow: hidden;
+    animation: fadeUp .35s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .section-header {
+    padding: 20px 28px 16px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .section-title { font-size: 15px; font-weight: 800; letter-spacing: -.3px; }
+  .section-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+
+  .section-body { padding: 24px 28px; display: flex; flex-direction: column; gap: 18px; }
+
+  /* Form fields */
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  .field-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: .03em; }
+  .field-input {
+    padding: 10px 14px; border-radius: 11px; border: 1.5px solid var(--border);
+    font-size: 14px; font-family: 'Manrope',sans-serif; font-weight: 500;
+    color: var(--text-primary); outline: none; background: var(--bg);
+    transition: all .2s;
+  }
+  .field-input:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 3px rgba(107,78,255,.08); }
+  .field-input:disabled { opacity: .5; cursor: not-allowed; }
+  .field-input::placeholder { color: var(--text-muted); }
+  .field-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  select.field-input { cursor: pointer; }
+  textarea.field-input { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+  /* Section footer */
+  .section-footer {
+    padding: 16px 28px; border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg);
+  }
+  .section-footer-hint { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .btn-save {
+    padding: 9px 20px; border-radius: 11px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff;
+    border: none; cursor: pointer; transition: all .2s;
+  }
+  .btn-save:hover { background: var(--purple-light); }
+  .btn-save.saved { background: var(--success); }
+
+  /* Logo upload */
+  .logo-upload-row { display: flex; align-items: center; gap: 16px; }
+  .logo-preview {
+    width: 64px; height: 64px; border-radius: 16px; background: var(--purple);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 800; color: #fff; flex-shrink: 0;
+    border: 2px solid var(--border);
+  }
+  .logo-upload-info { flex: 1; }
+  .logo-upload-info p { font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; }
+  .logo-upload-info span { font-size: 11px; color: var(--text-muted); font-weight: 500; }
+  .btn-upload {
+    padding: 8px 16px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .btn-upload:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* Toggle switches */
+  .toggle-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .toggle-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .toggle-row:first-child { padding-top: 0; }
+  .toggle-info { flex: 1; }
+  .toggle-label { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .toggle-desc { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .toggle-switch { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-left: 16px; }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0; border-radius: 100px;
+    background: var(--border); cursor: pointer; transition: background .2s;
+  }
+  .toggle-track::after {
+    content: ''; position: absolute; width: 18px; height: 18px;
+    border-radius: 50%; background: #fff; top: 3px; left: 3px;
+    transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.15);
+  }
+  .toggle-switch input:checked + .toggle-track { background: var(--purple); }
+  .toggle-switch input:checked + .toggle-track::after { transform: translateX(20px); }
+
+  /* Team members */
+  .member-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 0; border-bottom: 1px solid var(--border);
+  }
+  .member-row:last-of-type { border-bottom: none; }
+  .member-avatar {
+    width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: #fff;
+  }
+  .member-info { flex: 1; min-width: 0; }
+  .member-name { font-size: 14px; font-weight: 700; }
+  .member-email { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .member-role-select {
+    padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; outline: none;
+    transition: border-color .18s;
+  }
+  .member-role-select:hover { border-color: var(--purple); }
+  .member-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+  .member-badge.owner { background: var(--purple-soft); color: var(--purple); }
+  .btn-remove {
+    width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-muted); cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    transition: all .18s; flex-shrink: 0;
+  }
+  .btn-remove:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+
+  /* Invite row */
+  .invite-row { display: flex; gap: 8px; margin-top: 4px; }
+  .invite-input {
+    flex: 1; padding: 10px 14px; border-radius: 11px; border: 1.5px solid var(--border);
+    font-size: 14px; font-family: 'Manrope',sans-serif; font-weight: 500;
+    outline: none; background: var(--bg); color: var(--text-primary); transition: all .2s;
+  }
+  .invite-input:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 3px rgba(107,78,255,.08); }
+  .btn-invite {
+    padding: 10px 18px; border-radius: 11px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff;
+    border: none; cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .btn-invite:hover { background: var(--purple-light); }
+
+  /* Sessions */
+  .session-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--border);
+  }
+  .session-row:last-of-type { border-bottom: none; }
+  .session-icon { font-size: 22px; width: 32px; text-align: center; flex-shrink: 0; }
+  .session-info { flex: 1; }
+  .session-device { font-size: 14px; font-weight: 700; }
+  .session-meta { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+  .session-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+  .session-badge.current { background: var(--success-bg); color: var(--success); }
+  .btn-revoke {
+    padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .btn-revoke:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+
+  /* Danger zone */
+  .danger-zone { border-color: #FECACA !important; }
+  .danger-zone .section-header { background: var(--error-bg); border-bottom-color: #FECACA; }
+  .danger-zone .section-title { color: var(--error); }
+  .btn-danger {
+    padding: 9px 18px; border-radius: 11px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid #FECACA;
+    background: var(--white); color: var(--error); cursor: pointer; transition: all .2s;
+  }
+  .btn-danger:hover { background: var(--error-bg); border-color: var(--error); }
+
+  /* 2FA row */
+  .twofa-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+  .twofa-info p { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .twofa-info span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .btn-2fa {
+    padding: 9px 18px; border-radius: 11px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .2s;
+    white-space: nowrap;
+  }
+  .btn-2fa:hover { border-color: var(--purple); color: var(--purple); }
+
+  @media(max-width:768px){
+    nav{padding:0 20px} .page{grid-template-columns:1fr;padding:24px 20px 80px}
+    .settings-nav{position:static;display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+    .settings-nav-item{padding:7px 12px;font-size:13px}
+    .field-row{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='yoffer-dashboard.html'">Вакансии</button>
+    <button class="nav-link" onclick="window.location.href='yoffer-contacts.html'">Контакты</button>
+    <button class="nav-link active">Настройки</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- SIDEBAR NAV -->
+  <div class="settings-nav">
+    <button class="settings-nav-item active" onclick="goToSection('company', this)"><span class="nav-icon">🏢</span>Компания</button>
+    <button class="settings-nav-item" onclick="goToSection('account', this)"><span class="nav-icon">👤</span>Аккаунт</button>
+    <button class="settings-nav-item" onclick="goToSection('team', this)"><span class="nav-icon">👥</span>Команда</button>
+    <button class="settings-nav-item" onclick="goToSection('notifications', this)"><span class="nav-icon">🔔</span>Уведомления</button>
+    <button class="settings-nav-item" onclick="goToSection('security', this)"><span class="nav-icon">🔒</span>Безопасность</button>
+    <button class="settings-nav-item" onclick="goToSection('danger', this)" style="margin-top:16px;color:var(--error)"><span class="nav-icon">⚠️</span>Удаление</button>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="settings-content">
+
+    <!-- ── COMPANY ── -->
+    <div class="settings-section" id="section-company">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Профиль компании</div>
+          <div class="section-sub">Отображается в профилях вакансий для кандидатов</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="logo-upload-row">
+          <div class="logo-preview" id="logo-preview">Yo</div>
+          <div class="logo-upload-info">
+            <p>Логотип компании</p>
+            <span>PNG или JPG, не более 2 МБ, рекомендуется 200×200 px</span>
+          </div>
+          <button class="btn-upload" onclick="document.getElementById('logo-file').click()">Загрузить</button>
+          <input type="file" id="logo-file" accept="image/*" style="display:none" onchange="previewLogo(this)" />
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Название компании</div>
+            <input class="field-input" type="text" value="Yoffer Labs" placeholder="Название компании" />
+          </div>
+          <div class="field">
+            <div class="field-label">Отрасль</div>
+            <select class="field-input">
+              <option>IT / Разработка ПО</option>
+              <option>Финтех</option>
+              <option>EdTech</option>
+              <option>E-commerce</option>
+              <option>Маркетинг</option>
+              <option>Консалтинг</option>
+              <option>Другое</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Сайт</div>
+            <input class="field-input" type="url" value="https://yoffer.app" placeholder="https://..." />
+          </div>
+          <div class="field">
+            <div class="field-label">Размер команды</div>
+            <select class="field-input">
+              <option>1–10 человек</option>
+              <option>11–50 человек</option>
+              <option selected>51–200 человек</option>
+              <option>201–500 человек</option>
+              <option>500+ человек</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Город / Страна</div>
+            <input class="field-input" type="text" value="Рига, Латвия" placeholder="Город, страна" />
+          </div>
+          <div class="field">
+            <div class="field-label">LinkedIn</div>
+            <input class="field-input" type="url" placeholder="https://linkedin.com/company/..." />
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Описание компании</div>
+          <textarea class="field-input" placeholder="Коротко о компании — кандидаты видят это при отклике...">Yoffer — платформа для умного подбора персонала с ИИ. Помогаем компаниям находить лучших кандидатов быстрее.</textarea>
+          <div class="field-hint">До 500 символов. Видно кандидатам на странице вакансии.</div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <span class="section-footer-hint">Последнее изменение: 17 марта 2026</span>
+        <button class="btn-save" onclick="saveSection(this)">Сохранить</button>
+      </div>
+    </div>
+
+    <!-- ── ACCOUNT ── -->
+    <div class="settings-section" id="section-account">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Аккаунт</div>
+          <div class="section-sub">Личные данные и настройки входа</div>
+        </div>
+      </div>
+      <div class="section-body">
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Имя</div>
+            <input class="field-input" type="text" value="Алексей" />
+          </div>
+          <div class="field">
+            <div class="field-label">Фамилия</div>
+            <input class="field-input" type="text" value="Иванов" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <div class="field-label">Email</div>
+            <input class="field-input" type="email" value="alexey@yoffer.app" />
+          </div>
+          <div class="field">
+            <div class="field-label">Роль в компании</div>
+            <select class="field-input">
+              <option>Владелец</option>
+              <option selected>Руководитель отдела</option>
+              <option>HR-менеджер</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="padding-top:4px;border-top:1px solid var(--border)">
+          <div class="field-label" style="margin-bottom:10px">Смена пароля</div>
+          <div class="field-row">
+            <div class="field">
+              <div class="field-label">Текущий пароль</div>
+              <input class="field-input" type="password" placeholder="••••••••" />
+            </div>
+            <div class="field"></div>
+          </div>
+          <div class="field-row" style="margin-top:10px">
+            <div class="field">
+              <div class="field-label">Новый пароль</div>
+              <input class="field-input" type="password" placeholder="Минимум 8 символов" />
+            </div>
+            <div class="field">
+              <div class="field-label">Повторите пароль</div>
+              <input class="field-input" type="password" placeholder="••••••••" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="section-footer">
+        <span class="section-footer-hint">Email подтверждён ✓</span>
+        <button class="btn-save" onclick="saveSection(this)">Сохранить</button>
+      </div>
+    </div>
+
+    <!-- ── TEAM ── -->
+    <div class="settings-section" id="section-team">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Команда</div>
+          <div class="section-sub">Доступ к аккаунту компании</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- Members -->
+        <div id="members-list">
+          <div class="member-row">
+            <div class="member-avatar" style="background:#6B4EFF">АИ</div>
+            <div class="member-info">
+              <div class="member-name">Алексей Иванов <span style="font-size:11px;color:var(--text-muted);font-weight:500">(вы)</span></div>
+              <div class="member-email">alexey@yoffer.app</div>
+            </div>
+            <span class="member-badge owner">Владелец</span>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background:#10B981">МС</div>
+            <div class="member-info">
+              <div class="member-name">Мария Смирнова</div>
+              <div class="member-email">maria@yoffer.app</div>
+            </div>
+            <select class="member-role-select" onchange="changeMemberRole(this)">
+              <option value="hr" selected>HR-менеджер</option>
+              <option value="manager">Руководитель</option>
+              <option value="owner">Владелец</option>
+            </select>
+            <button class="btn-remove" onclick="removeMember(this)" title="Удалить">✕</button>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background:#F59E0B">КП</div>
+            <div class="member-info">
+              <div class="member-name">Кирилл Петров</div>
+              <div class="member-email">kirill@yoffer.app</div>
+            </div>
+            <select class="member-role-select" onchange="changeMemberRole(this)">
+              <option value="hr">HR-менеджер</option>
+              <option value="manager" selected>Руководитель</option>
+              <option value="owner">Владелец</option>
+            </select>
+            <button class="btn-remove" onclick="removeMember(this)" title="Удалить">✕</button>
+          </div>
+        </div>
+
+        <!-- Invite -->
+        <div style="padding-top:16px;border-top:1px solid var(--border)">
+          <div class="field-label" style="margin-bottom:8px">Пригласить коллегу</div>
+          <div class="invite-row">
+            <input class="invite-input" id="invite-email" type="email" placeholder="email@company.com" onkeydown="if(event.key==='Enter')sendInvite()" />
+            <select class="field-input" id="invite-role" style="width:160px;padding:10px 12px">
+              <option value="hr">HR-менеджер</option>
+              <option value="manager">Руководитель</option>
+              <option value="owner">Владелец</option>
+            </select>
+            <button class="btn-invite" onclick="sendInvite()">Пригласить</button>
+          </div>
+          <div class="field-hint" style="margin-top:6px">Коллега получит письмо с приглашением на email</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── NOTIFICATIONS ── -->
+    <div class="settings-section" id="section-notifications">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Уведомления</div>
+          <div class="section-sub">Управляйте тем, что приходит на email</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Новые совпадения</div>
+            <div class="toggle-desc">Когда алгоритм находит новых подходящих кандидатов</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Ответы кандидатов</div>
+            <div class="toggle-desc">Когда кандидат принял приглашение или ответил на диалог</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Тестовые задания</div>
+            <div class="toggle-desc">Когда кандидат выполнил и отправил тестовое задание</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Еженедельный дайджест</div>
+            <div class="toggle-desc">Сводка по всем вакансиям и кандидатам за неделю</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Рекомендации ИИ</div>
+            <div class="toggle-desc">Советы по улучшению профилей вакансий</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <div class="toggle-info">
+            <div class="toggle-label">Напоминания</div>
+            <div class="toggle-desc">Кандидаты без ответа более 3 дней</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" checked onchange="saveToggle(this)">
+            <div class="toggle-track"></div>
+          </label>
+        </div>
+
+      </div>
+      <div class="section-footer">
+        <span class="section-footer-hint">Изменения применяются сразу</span>
+        <span style="font-size:12px;color:var(--success);font-weight:600" id="notif-saved" style="opacity:0">✓ Сохранено</span>
+      </div>
+    </div>
+
+    <!-- ── SECURITY ── -->
+    <div class="settings-section" id="section-security">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Безопасность</div>
+          <div class="section-sub">Сессии и двухфакторная аутентификация</div>
+        </div>
+      </div>
+      <div class="section-body">
+
+        <!-- 2FA -->
+        <div class="twofa-row">
+          <div class="twofa-info">
+            <p>Двухфакторная аутентификация</p>
+            <span>Дополнительная защита при входе через приложение-аутентификатор</span>
+          </div>
+          <button class="btn-2fa" id="btn-2fa" onclick="toggle2FA()">Включить 2FA</button>
+        </div>
+
+        <div style="padding-top:16px;border-top:1px solid var(--border)">
+          <div class="field-label" style="margin-bottom:12px">Активные сессии</div>
+
+          <div class="session-row">
+            <div class="session-icon">💻</div>
+            <div class="session-info">
+              <div class="session-device">MacBook Pro — Chrome</div>
+              <div class="session-meta">Рига, Латвия · Сейчас</div>
+            </div>
+            <span class="session-badge current">Текущая</span>
+          </div>
+
+          <div class="session-row">
+            <div class="session-icon">📱</div>
+            <div class="session-info">
+              <div class="session-device">iPhone 15 — Safari</div>
+              <div class="session-meta">Рига, Латвия · 2 часа назад</div>
+            </div>
+            <button class="btn-revoke" onclick="revokeSession(this)">Завершить</button>
+          </div>
+
+          <div class="session-row">
+            <div class="session-icon">💻</div>
+            <div class="session-info">
+              <div class="session-device">Windows PC — Firefox</div>
+              <div class="session-meta">Таллин, Эстония · 3 дня назад</div>
+            </div>
+            <button class="btn-revoke" onclick="revokeSession(this)">Завершить</button>
+          </div>
+
+        </div>
+
+        <div style="padding-top:4px">
+          <button class="btn-danger" onclick="revokeAll()" style="font-size:13px">Завершить все сессии кроме текущей</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ── DANGER ZONE ── -->
+    <div class="settings-section danger-zone" id="section-danger">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Опасная зона</div>
+          <div class="section-sub">Необратимые действия</div>
+        </div>
+      </div>
+      <div class="section-body" style="gap:14px">
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0">
+          <div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:3px">Экспорт данных</div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:500">Скачать все вакансии, контакты и профили в формате JSON</div>
+          </div>
+          <button class="btn-danger" onclick="exportData()">Экспортировать</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid #FECACA">
+          <div>
+            <div style="font-size:14px;font-weight:700;margin-bottom:3px">Удалить все вакансии</div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:500">Удалит все вакансии и профили кандидатов. Контакты сохранятся.</div>
+          </div>
+          <button class="btn-danger" onclick="confirmDelete('vacancies')">Удалить вакансии</button>
+        </div>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-top:1px solid #FECACA">
+          <div>
+            <div style="font-size:14px;font-weight:700;color:var(--error);margin-bottom:3px">Удалить аккаунт</div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:500">Удалит компанию, всех участников и все данные. Восстановить невозможно.</div>
+          </div>
+          <button class="btn-danger" style="border-color:var(--error);color:var(--error)" onclick="confirmDelete('account')">Удалить аккаунт</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── SCROLL & ACTIVE NAV ──
+function goToSection(id, btn) {
+  const el = document.getElementById('section-' + id);
+  if (!el) return;
+  const offset = 84;
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top, behavior: 'smooth' });
+  document.querySelectorAll('.settings-nav-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// Highlight nav on scroll
+const sections = ['company','account','team','notifications','security','danger'];
+window.addEventListener('scroll', () => {
+  let current = sections[0];
+  sections.forEach(id => {
+    const el = document.getElementById('section-' + id);
+    if (el && el.getBoundingClientRect().top < 160) current = id;
+  });
+  document.querySelectorAll('.settings-nav-item').forEach((btn, i) => {
+    btn.classList.toggle('active', sections[i] === current);
+  });
+});
+
+// ── SAVE ──
+function saveSection(btn) {
+  const orig = btn.textContent;
+  btn.textContent = '✓ Сохранено';
+  btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = orig; btn.classList.remove('saved'); }, 2000);
+}
+
+function saveToggle(input) {
+  const el = document.getElementById('notif-saved');
+  el.style.opacity = '1';
+  setTimeout(() => el.style.opacity = '0', 2000);
+}
+
+// ── LOGO PREVIEW ──
+function previewLogo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const preview = document.getElementById('logo-preview');
+    preview.style.background = 'none';
+    preview.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:14px">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── TEAM ──
+function removeMember(btn) {
+  if (!confirm('Убрать участника из команды?')) return;
+  btn.closest('.member-row').style.opacity = '0';
+  btn.closest('.member-row').style.transition = 'opacity .3s';
+  setTimeout(() => btn.closest('.member-row').remove(), 300);
+  showToast('Участник удалён');
+}
+
+function changeMemberRole(select) {
+  showToast('Роль обновлена');
+}
+
+function sendInvite() {
+  const email = document.getElementById('invite-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('invite-email').focus();
+    document.getElementById('invite-email').style.borderColor = 'var(--error)';
+    setTimeout(() => document.getElementById('invite-email').style.borderColor = '', 1500);
+    return;
+  }
+  const role = document.getElementById('invite-role').value;
+  const roleLabel = { hr: 'HR-менеджер', manager: 'Руководитель', owner: 'Владелец' }[role];
+
+  // Add to list
+  const list = document.getElementById('members-list');
+  const initials = email.substring(0, 2).toUpperCase();
+  const colors = ['#8B5CF6','#06B6D4','#F97316','#EC4899','#84CC16'];
+  const color = colors[Math.floor(Math.random() * colors.length)];
+  const row = document.createElement('div');
+  row.className = 'member-row';
+  row.style.animation = 'fadeUp .3s ease';
+  row.innerHTML = `
+    <div class="member-avatar" style="background:${color}">${initials}</div>
+    <div class="member-info">
+      <div class="member-name">${email} <span style="font-size:11px;color:var(--warning);font-weight:600">Ожидает</span></div>
+      <div class="member-email">Приглашение отправлено</div>
+    </div>
+    <select class="member-role-select" onchange="changeMemberRole(this)">
+      <option value="hr" ${role==='hr'?'selected':''}>HR-менеджер</option>
+      <option value="manager" ${role==='manager'?'selected':''}>Руководитель</option>
+      <option value="owner" ${role==='owner'?'selected':''}>Владелец</option>
+    </select>
+    <button class="btn-remove" onclick="removeMember(this)" title="Отозвать">✕</button>
+  `;
+  list.appendChild(row);
+  document.getElementById('invite-email').value = '';
+  showToast('Приглашение отправлено на ' + email);
+}
+
+// ── 2FA ──
+let twoFAEnabled = false;
+function toggle2FA() {
+  twoFAEnabled = !twoFAEnabled;
+  const btn = document.getElementById('btn-2fa');
+  btn.textContent = twoFAEnabled ? '✓ 2FA включена' : 'Включить 2FA';
+  btn.style.background = twoFAEnabled ? 'var(--success-bg)' : '';
+  btn.style.color = twoFAEnabled ? 'var(--success)' : '';
+  btn.style.borderColor = twoFAEnabled ? 'var(--success)' : '';
+  showToast(twoFAEnabled ? 'Двухфакторная аутентификация включена' : '2FA отключена');
+}
+
+// ── SESSIONS ──
+function revokeSession(btn) {
+  if (!confirm('Завершить эту сессию?')) return;
+  const row = btn.closest('.session-row');
+  row.style.opacity = '0'; row.style.transition = 'opacity .3s';
+  setTimeout(() => row.remove(), 300);
+  showToast('Сессия завершена');
+}
+
+function revokeAll() {
+  if (!confirm('Завершить все сессии кроме текущей?')) return;
+  document.querySelectorAll('.btn-revoke').forEach(btn => {
+    const row = btn.closest('.session-row');
+    row.style.opacity = '0'; row.style.transition = 'opacity .3s';
+    setTimeout(() => row.remove(), 300);
+  });
+  showToast('Все остальные сессии завершены');
+}
+
+// ── DANGER ──
+function exportData() {
+  showToast('Экспорт подготовлен — ссылка придёт на email');
+}
+
+function confirmDelete(type) {
+  const msgs = {
+    vacancies: 'Удалить все вакансии и профили кандидатов? Это действие нельзя отменить.',
+    account: 'Удалить аккаунт компании и все данные? Это действие нельзя отменить никогда.',
+  };
+  if (confirm(msgs[type])) {
+    showToast(type === 'account' ? 'Аккаунт будет удалён в течение 24 часов' : 'Все вакансии удалены');
+  }
+}
+
+// ── TOAST ──
+function showToast(text) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 22px;border-radius:100px;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;z-index:9999;white-space:nowrap;animation:fadeUp .3s ease';
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2500);
+}
+</script>
+</body>
+</html>

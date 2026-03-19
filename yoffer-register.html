@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Регистрация</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --border-focus: #6B4EFF;
+    --error: #EF4444;
+    --success: #10B981;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-login { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: color .2s; }
+  .nav-login:hover { color: var(--purple); }
+  .nav-login span { color: var(--purple); }
+
+  /* LAYOUT */
+  .page { flex: 1; display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 64px); }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: linear-gradient(145deg, #F0EDFF 0%, #E8E3FF 50%, #DDD6FF 100%);
+    padding: 64px 56px; display: flex; flex-direction: column;
+    justify-content: center; position: relative; overflow: hidden;
+  }
+  .left-panel::before {
+    content: ''; position: absolute; top: -120px; right: -80px;
+    width: 400px; height: 400px; border-radius: 50%;
+    background: rgba(107,78,255,.12); filter: blur(60px);
+  }
+  .left-panel::after {
+    content: ''; position: absolute; bottom: -80px; left: -60px;
+    width: 300px; height: 300px; border-radius: 50%;
+    background: rgba(107,78,255,.08); filter: blur(48px);
+  }
+  .left-content { position: relative; z-index: 1; }
+  .left-tag { display: inline-block; background: rgba(107,78,255,.15); color: var(--purple); font-size: 12px; font-weight: 700; padding: 5px 14px; border-radius: 100px; margin-bottom: 28px; letter-spacing: .04em; }
+  .left-panel h2 { font-size: clamp(28px, 3vw, 40px); font-weight: 800; letter-spacing: -1px; line-height: 1.15; margin-bottom: 20px; color: var(--text-primary); }
+  .left-panel h2 .acc { color: var(--purple); }
+  .left-panel p { font-size: 15px; color: var(--text-secondary); line-height: 1.7; font-weight: 500; margin-bottom: 40px; }
+
+  .feat-list { display: flex; flex-direction: column; gap: 14px; }
+  .feat-item { display: flex; align-items: flex-start; gap: 12px; }
+  .feat-icon { width: 36px; height: 36px; border-radius: 10px; background: var(--white); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(107,78,255,.12); }
+  .feat-text strong { display: block; font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .feat-text span { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+
+  /* Stats */
+  .stats { display: flex; gap: 32px; margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(107,78,255,.15); }
+  .stat-val { font-size: 28px; font-weight: 800; color: var(--purple); letter-spacing: -1px; }
+  .stat-lbl { font-size: 12px; color: var(--text-secondary); font-weight: 500; margin-top: 2px; }
+
+  /* RIGHT PANEL - FORM */
+  .right-panel { padding: 64px 56px; display: flex; align-items: center; justify-content: center; }
+  .form-wrap { width: 100%; max-width: 440px; }
+
+  .form-title { font-size: 28px; font-weight: 800; letter-spacing: -0.8px; margin-bottom: 6px; }
+  .form-sub { font-size: 15px; color: var(--text-secondary); font-weight: 500; margin-bottom: 36px; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 18px; }
+  label { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 7px; }
+  input:not([type=checkbox]), select {
+    width: 100%; padding: 12px 16px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: var(--white);
+    font-size: 14px; font-family: 'Manrope', sans-serif;
+    font-weight: 500; color: var(--text-primary);
+    transition: border-color .2s, box-shadow .2s; outline: none;
+    appearance: none; -webkit-appearance: none;
+  }
+  input::placeholder { color: var(--text-muted); }
+  input:not([type=checkbox]):focus, select:focus { border-color: var(--border-focus); box-shadow: 0 0 0 4px rgba(107,78,255,.1); }
+  input.error { border-color: var(--error); }
+  .field-error { font-size: 12px; color: var(--error); font-weight: 500; margin-top: 5px; display: none; }
+  .field-error.show { display: block; }
+
+  /* Select arrow */
+  .select-wrap { position: relative; }
+  .select-wrap::after { content: '▾'; position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 13px; pointer-events: none; }
+
+  /* Password toggle */
+  .pw-wrap { position: relative; }
+  .pw-wrap input { padding-right: 44px; }
+  .pw-toggle { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 0; transition: color .15s; }
+  .pw-toggle:hover { color: var(--purple); }
+
+  /* Password strength */
+  .pw-strength { margin-top: 8px; display: flex; gap: 4px; }
+  .pw-bar { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background .3s; }
+  .pw-bar.weak { background: var(--error); }
+  .pw-bar.medium { background: #F59E0B; }
+  .pw-bar.strong { background: var(--success); }
+  .pw-hint { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-top: 5px; }
+
+  /* Role cards */
+  .role-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .role-card {
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 12px 10px; text-align: center; cursor: pointer;
+    transition: all .18s; background: var(--white);
+    position: relative; z-index: 1; user-select: none;
+    font-family: "Manrope", sans-serif; width: 100%;
+    outline: none; appearance: none;
+  }
+  .role-card:hover { border-color: var(--purple-mid); }
+  .role-card.selected { border-color: var(--purple); background: var(--purple-soft); }
+  .role-card.selected .role-name { color: var(--purple); }
+  .role-emoji { font-size: 20px; margin-bottom: 5px; }
+  .role-name { font-size: 12px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+
+  /* Checkbox */
+  .check-row { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 24px; margin-top: 6px; }
+  .check-row input[type=checkbox] {
+    width: 18px !important; height: 18px !important;
+    min-width: 18px; flex-shrink: 0; margin-top: 2px;
+    accent-color: var(--purple); cursor: pointer;
+    border: 1.5px solid var(--border); border-radius: 4px;
+    padding: 0; box-shadow: none;
+  }
+  .check-row label { font-size: 13px; color: var(--text-secondary); font-weight: 500; cursor: pointer; margin: 0; line-height: 1.5; }
+  .check-row a { color: var(--purple); text-decoration: none; font-weight: 600; }
+
+  /* Submit btn */
+  .btn-submit {
+    width: 100%; padding: 15px; border-radius: 14px;
+    font-size: 15px; font-weight: 700; font-family: 'Manrope', sans-serif;
+    color: #fff; background: var(--purple); border: none; cursor: pointer;
+    transition: all .25s; box-shadow: 0 6px 24px rgba(107,78,255,.32);
+  }
+  .btn-submit:hover { background: var(--purple-light); transform: translateY(-1px); box-shadow: 0 10px 32px rgba(107,78,255,.4); }
+  .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+  .form-footer { text-align: center; margin-top: 20px; font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+  .form-footer a { color: var(--purple); font-weight: 700; text-decoration: none; }
+
+  /* ── MODAL OVERLAY ── */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26, 26, 46, 0.55);
+    backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--white); border-radius: 24px;
+    padding: 44px 40px; width: 100%; max-width: 420px;
+    box-shadow: 0 32px 80px rgba(26,26,46,.2);
+    transform: translateY(16px) scale(.97);
+    transition: transform .3s ease, opacity .3s ease;
+    text-align: center;
+  }
+  .modal-overlay.show .modal { transform: translateY(0) scale(1); }
+
+  .modal-icon { font-size: 44px; margin-bottom: 16px; }
+  .modal h3 { font-size: 22px; font-weight: 800; letter-spacing: -.5px; margin-bottom: 8px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; line-height: 1.6; margin-bottom: 32px; }
+  .modal-sub b { color: var(--text-primary); font-weight: 700; }
+
+  /* Code input */
+  .code-inputs { display: flex; gap: 10px; justify-content: center; margin-bottom: 8px; }
+  .code-box {
+    width: 52px; height: 60px; border-radius: 14px;
+    border: 2px solid var(--border); background: var(--bg);
+    font-size: 24px; font-weight: 800; font-family: 'Manrope', sans-serif;
+    text-align: center; color: var(--text-primary);
+    transition: all .18s; outline: none; caret-color: var(--purple);
+  }
+  .code-box:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 4px rgba(107,78,255,.1); }
+  .code-box.filled { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .code-box.error-box { border-color: var(--error); background: #FFF5F5; animation: shake .3s ease; }
+
+  @keyframes shake {
+    0%,100%{transform:translateX(0)}
+    20%,60%{transform:translateX(-6px)}
+    40%,80%{transform:translateX(6px)}
+  }
+
+  .code-error { font-size: 13px; color: var(--error); font-weight: 600; min-height: 18px; margin-bottom: 12px; }
+
+  .resend-row { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 28px; }
+  .resend-btn { background: none; border: none; color: var(--purple); font-weight: 700; font-family: 'Manrope', sans-serif; font-size: 13px; cursor: pointer; padding: 0; }
+  .resend-btn:disabled { color: var(--text-muted); cursor: not-allowed; }
+  #timer { color: var(--text-muted); }
+
+  .btn-confirm {
+    width: 100%; padding: 14px; border-radius: 14px;
+    font-size: 15px; font-weight: 700; font-family: 'Manrope', sans-serif;
+    color: #fff; background: var(--purple); border: none; cursor: pointer;
+    transition: all .25s; box-shadow: 0 6px 24px rgba(107,78,255,.3);
+    margin-bottom: 14px;
+  }
+  .btn-confirm:hover { background: var(--purple-light); transform: translateY(-1px); }
+  .btn-confirm:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+  .modal-change { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .modal-change a { color: var(--purple); font-weight: 600; text-decoration: none; cursor: pointer; }
+
+  /* SUCCESS STATE */
+  .success-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(26,26,46,.6); backdrop-filter: blur(8px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .success-overlay.show { opacity: 1; pointer-events: all; }
+  .success-card {
+    background: var(--white); border-radius: 24px; padding: 52px 44px;
+    width: 100%; max-width: 380px; text-align: center;
+    box-shadow: 0 32px 80px rgba(26,26,46,.2);
+    transform: scale(.92); transition: transform .35s cubic-bezier(.34,1.56,.64,1);
+  }
+  .success-overlay.show .success-card { transform: scale(1); }
+  .success-circle {
+    width: 72px; height: 72px; border-radius: 50%;
+    background: linear-gradient(135deg, #10B981, #059669);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 32px; margin: 0 auto 20px;
+    box-shadow: 0 8px 24px rgba(16,185,129,.3);
+  }
+  .success-card h3 { font-size: 24px; font-weight: 800; margin-bottom: 8px; letter-spacing: -.5px; }
+  .success-card p { font-size: 14px; color: var(--text-secondary); font-weight: 500; line-height: 1.6; margin-bottom: 28px; }
+  .btn-go {
+    width: 100%; padding: 14px; border-radius: 14px;
+    font-size: 15px; font-weight: 700; font-family: 'Manrope', sans-serif;
+    color: #fff; background: var(--purple); border: none; cursor: pointer;
+    transition: all .25s; box-shadow: 0 6px 24px rgba(107,78,255,.3);
+  }
+  .btn-go:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  @media(max-width:900px){
+    .page{grid-template-columns:1fr}
+    .left-panel{display:none}
+    .right-panel{padding:40px 24px}
+    nav{padding:0 24px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="yoffer-landing.html" class="nav-logo">YOFFER</a>
+  <a href="#" class="nav-login" href="yoffer-dashboard.html">Уже есть аккаунт? <span>Войти</span></a>
+</nav>
+
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div class="left-content">
+      <div class="left-tag">Для работодателей</div>
+      <h2>Найдите нужного <span class="acc">человека</span> — не резюме</h2>
+      <p>Опишите задачу или ответьте на вопросы ИИ — получите точный профиль кандидата и список совпадений за 15 минут.</p>
+
+      <div class="feat-list">
+        <div class="feat-item">
+          <div class="feat-icon">🤖</div>
+          <div class="feat-text">
+            <strong>ИИ-интервью вместо форм</strong>
+            <span>Просто отвечайте на вопросы — профиль строится автоматически</span>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon">⚡</div>
+          <div class="feat-text">
+            <strong>Точный мэтчинг</strong>
+            <span>Совпадение по 6 критериям: навыки, опыт, психотип, условия</span>
+          </div>
+        </div>
+        <div class="feat-item">
+          <div class="feat-icon">🔗</div>
+          <div class="feat-text">
+            <strong>Поделиться с командой</strong>
+            <span>Ссылка на профиль с правами редактирования или просмотра</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats">
+        <div>
+          <div class="stat-val">1 200+</div>
+          <div class="stat-lbl">компаний</div>
+        </div>
+        <div>
+          <div class="stat-val">15 мин</div>
+          <div class="stat-lbl">до первых совпадений</div>
+        </div>
+        <div>
+          <div class="stat-val">94%</div>
+          <div class="stat-lbl">точность мэтча</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT — FORM -->
+  <div class="right-panel">
+    <div class="form-wrap">
+      <h1 class="form-title">Создать аккаунт</h1>
+      <p class="form-sub">Регистрация займёт 2 минуты</p>
+
+      <div class="form-row">
+        <div class="form-group" style="margin-bottom:0">
+          <label for="fname">Имя</label>
+          <input type="text" id="fname" placeholder="Алексей" autocomplete="given-name" />
+          <div class="field-error" id="err-fname">Введите имя</div>
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label for="lname">Фамилия</label>
+          <input type="text" id="lname" placeholder="Иванов" autocomplete="family-name" />
+          <div class="field-error" id="err-lname">Введите фамилию</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="company">Компания</label>
+        <input type="text" id="company" placeholder="Название компании" />
+        <div class="field-error" id="err-company">Введите название компании</div>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" placeholder="alex@company.com" autocomplete="email" />
+        <div class="field-error" id="err-email">Введите корректный email</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <div class="pw-wrap">
+          <input type="password" id="password" placeholder="Минимум 8 символов" autocomplete="new-password" oninput="checkPw(this.value)" />
+          <button type="button" class="pw-toggle" onclick="togglePw()" id="pw-eye">👁</button>
+        </div>
+        <div class="pw-strength" id="pw-strength" style="display:none">
+          <div class="pw-bar" id="bar1"></div>
+          <div class="pw-bar" id="bar2"></div>
+          <div class="pw-bar" id="bar3"></div>
+        </div>
+        <div class="pw-hint" id="pw-hint"></div>
+        <div class="field-error" id="err-pw">Пароль минимум 8 символов</div>
+      </div>
+
+      <div class="form-group">
+        <label>Ваша роль</label>
+        <div class="role-grid">
+          <button type="button" class="role-card" id="role-hr" onclick="document.querySelectorAll('.role-card').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+            <div class="role-emoji">👩‍💼</div>
+            <div class="role-name">HR-специалист</div>
+          </button>
+          <button type="button" class="role-card selected" id="role-manager" onclick="document.querySelectorAll('.role-card').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+            <div class="role-emoji">👨‍💻</div>
+            <div class="role-name">Руководитель отдела</div>
+          </button>
+          <button type="button" class="role-card" id="role-owner" onclick="document.querySelectorAll('.role-card').forEach(b=>b.classList.remove('selected'));this.classList.add('selected')">
+            <div class="role-emoji">🏢</div>
+            <div class="role-name">Владелец компании</div>
+          </button>
+        </div>
+        <div class="field-error" id="err-role">Выберите роль</div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="agree" />
+        <label for="agree">Я принимаю <a href="#">пользовательское соглашение</a> и <a href="#">политику конфиденциальности</a></label>
+      </div>
+
+      <button class="btn-submit" onclick="localStorage.setItem('yoffer_role', document.querySelector('.role-card.selected')?.id?.replace('role-','') || 'manager'); window.location.href='yoffer-dashboard.html'">Создать аккаунт →</button>
+
+      <p class="form-footer">Уже есть аккаунт? <a href="yoffer-dashboard.html">Войти</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Подтверждение email -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-icon">✉️</div>
+    <h3>Проверьте почту</h3>
+    <p class="modal-sub">Мы отправили 6-значный код на<br><b id="modal-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="96f7faf3eed6f5f9fbe6f7f8efb8f5f9fb">[email&#160;protected]</a></b></p>
+
+    <div class="code-inputs">
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c0" oninput="codeInput(this,0)" onkeydown="codeKey(event,0)" />
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c1" oninput="codeInput(this,1)" onkeydown="codeKey(event,1)" />
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c2" oninput="codeInput(this,2)" onkeydown="codeKey(event,2)" />
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c3" oninput="codeInput(this,3)" onkeydown="codeKey(event,3)" />
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c4" oninput="codeInput(this,4)" onkeydown="codeKey(event,4)" />
+      <input class="code-box" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]" id="c5" oninput="codeInput(this,5)" onkeydown="codeKey(event,5)" />
+    </div>
+    <div class="code-error" id="code-error"></div>
+
+    <div class="resend-row">
+      Не пришло? <button class="resend-btn" id="resend-btn" onclick="resendCode()" disabled>Отправить повторно</button>
+      <span id="timer"> через 30 сек</span>
+    </div>
+
+    <button class="btn-confirm" id="btn-confirm" onclick="confirmCode()" disabled>Подтвердить</button>
+    <div class="modal-change">Неверный email? <a onclick="closeModal()">Изменить</a></div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-overlay" id="success">
+  <div class="success-card">
+    <div class="success-circle">✓</div>
+    <h3>Добро пожаловать в YOFFER!</h3>
+    <p>Аккаунт успешно создан. Сейчас перейдём в ваш личный кабинет.</p>
+    <button class="btn-go" onclick="goToDashboard()">Перейти в кабинет →</button>
+  </div>
+</div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+let selectedRole = 'manager';
+let timerInterval;
+
+// Role selection
+function selectRole(el, role) {
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRole = role;
+}
+
+// Password toggle
+function togglePw() {
+  const inp = document.getElementById('password');
+  const eye = document.getElementById('pw-eye');
+  if (inp.type === 'password') { inp.type = 'text'; eye.textContent = '🙈'; }
+  else { inp.type = 'password'; eye.textContent = '👁'; }
+}
+
+// Password strength
+function checkPw(val) {
+  const s = document.getElementById('pw-strength');
+  const hint = document.getElementById('pw-hint');
+  const bars = [document.getElementById('bar1'), document.getElementById('bar2'), document.getElementById('bar3')];
+  if (!val) { s.style.display = 'none'; hint.textContent = ''; return; }
+  s.style.display = 'flex';
+  bars.forEach(b => { b.className = 'pw-bar'; });
+  let score = 0;
+  if (val.length >= 8) score++;
+  if (/[A-Z]/.test(val) || /[а-яА-Я]/.test(val)) score++;
+  if (/[0-9]/.test(val) && /[^a-zA-Z0-9а-яА-Я]/.test(val)) score++;
+  if (score === 1) { bars[0].classList.add('weak'); hint.textContent = 'Слабый пароль'; hint.style.color = '#EF4444'; }
+  else if (score === 2) { bars[0].classList.add('medium'); bars[1].classList.add('medium'); hint.textContent = 'Средний пароль'; hint.style.color = '#F59E0B'; }
+  else { bars.forEach(b => b.classList.add('strong')); hint.textContent = 'Надёжный пароль'; hint.style.color = '#10B981'; }
+}
+
+// Form validation
+function validate() {
+  let ok = true;
+  const fields = [
+    { id: 'fname',    err: 'err-fname',   check: v => v.trim().length > 0 },
+    { id: 'lname',    err: 'err-lname',   check: v => v.trim().length > 0 },
+    { id: 'company',  err: 'err-company', check: v => v.trim().length > 0 },
+    { id: 'email',    err: 'err-email',   check: v => v.trim().length > 0 },
+    { id: 'password', err: 'err-pw',      check: v => v.trim().length > 0 },
+  ];
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.err);
+    if (!f.check(el.value)) { el.classList.add('error'); err.classList.add('show'); ok = false; }
+    else { el.classList.remove('error'); err.classList.remove('show'); }
+  });
+  return ok;
+}
+
+function submitForm() {
+  if (!validate()) return;
+  const email = document.getElementById('email').value;
+  document.getElementById('modal-email').textContent = email;
+  document.getElementById('modal').classList.add('show');
+  startTimer();
+  document.getElementById('c0').focus();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+  clearInterval(timerInterval);
+  resetCode();
+}
+
+// Timer
+function startTimer() {
+  let sec = 30;
+  const timerEl = document.getElementById('timer');
+  const resendBtn = document.getElementById('resend-btn');
+  resendBtn.disabled = true;
+  timerEl.style.display = 'inline';
+  timerEl.textContent = ` через ${sec} сек`;
+  timerInterval = setInterval(() => {
+    sec--;
+    timerEl.textContent = ` через ${sec} сек`;
+    if (sec <= 0) {
+      clearInterval(timerInterval);
+      resendBtn.disabled = false;
+      timerEl.style.display = 'none';
+    }
+  }, 1000);
+}
+
+function resendCode() {
+  resetCode();
+  document.getElementById('code-error').textContent = '';
+  startTimer();
+  document.getElementById('c0').focus();
+  // Show feedback
+  const btn = document.getElementById('resend-btn');
+  btn.textContent = 'Отправлено ✓';
+  setTimeout(() => btn.textContent = 'Отправить повторно', 2000);
+}
+
+// Code input logic
+function codeInput(el, idx) {
+  const val = el.value.replace(/[^0-9]/g, '');
+  el.value = val;
+  if (val) {
+    el.classList.add('filled');
+    el.classList.remove('error-box');
+    if (idx < 5) document.getElementById('c' + (idx + 1)).focus();
+  } else {
+    el.classList.remove('filled');
+  }
+  checkAllFilled();
+}
+
+function codeKey(e, idx) {
+  if (e.key === 'Backspace' && !document.getElementById('c' + idx).value && idx > 0) {
+    document.getElementById('c' + (idx - 1)).focus();
+  }
+}
+
+function checkAllFilled() {
+  const all = Array.from({length: 6}, (_, i) => document.getElementById('c' + i).value);
+  document.getElementById('btn-confirm').disabled = all.some(v => !v);
+}
+
+function getCode() {
+  return Array.from({length: 6}, (_, i) => document.getElementById('c' + i).value).join('');
+}
+
+function resetCode() {
+  for (let i = 0; i < 6; i++) {
+    const el = document.getElementById('c' + i);
+    el.value = '';
+    el.classList.remove('filled', 'error-box');
+  }
+  document.getElementById('btn-confirm').disabled = true;
+}
+
+function confirmCode() {
+  const code = getCode();
+  // Demo: any 6-digit code works (in real app — verify with backend)
+  if (code.length === 6) {
+    document.getElementById('modal').classList.remove('show');
+    setTimeout(() => {
+      document.getElementById('success').classList.add('show');
+    }, 200);
+  } else {
+    for (let i = 0; i < 6; i++) document.getElementById('c' + i).classList.add('error-box');
+    document.getElementById('code-error').textContent = 'Неверный код. Попробуйте ещё раз.';
+    resetCode();
+    setTimeout(() => document.getElementById('c0').focus(), 50);
+  }
+}
+
+function goToDashboard() {
+  window.location.href = 'yoffer-dashboard.html';
+}
+
+// Clear errors on input
+['fname','lname','company','email','password'].forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    this.classList.remove('error');
+    document.getElementById('err-' + (id === 'password' ? 'pw' : id)).classList.remove('show');
+  });
+});
+
+// Allow paste of full code
+document.getElementById('c0').addEventListener('paste', e => {
+  e.preventDefault();
+  const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g,'').slice(0,6);
+  text.split('').forEach((ch, i) => {
+    const el = document.g

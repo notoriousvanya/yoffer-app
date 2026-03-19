@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Профиль кандидата</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+    --error: #EF4444;
+    --error-bg: #FEF2F2;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+
+  /* PROGRESS */
+  .progress-wrap {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 56px;
+    display: flex; align-items: center;
+    position: sticky; top: 64px; z-index: 49;
+  }
+  .step { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); padding: 0 4px; }
+  .step.active { color: var(--purple); }
+  .step.done { color: var(--success); }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: var(--bg); border: 2px solid var(--border); color: var(--text-muted); flex-shrink: 0; }
+  .step.active .step-num { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .step.done .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; min-width: 32px; }
+  .step-line.done { background: var(--success); }
+
+  /* PAGE */
+  .page { max-width: 1100px; margin: 0 auto; padding: 40px 24px 100px; display: grid; grid-template-columns: 1fr 340px; gap: 24px; align-items: start; }
+
+  /* ── LEFT COLUMN ── */
+  .left-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Profile header card */
+  .profile-header {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 28px 32px;
+    animation: fadeUp .4s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  .ph-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+  .ph-role-wrap { flex: 1; }
+  .ph-role-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .06em; text-transform: uppercase; margin-bottom: 6px; }
+  .ph-role { font-size: 26px; font-weight: 800; letter-spacing: -.7px; line-height: 1.1; }
+  .ph-role-ai { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; font-size: 12px; font-weight: 600; color: var(--purple); background: var(--purple-soft); padding: 3px 10px; border-radius: 100px; cursor: pointer; }
+  .ph-role-ai:hover { background: var(--purple-mid); }
+
+  .ph-completeness { text-align: right; flex-shrink: 0; }
+  .ph-pct { font-size: 36px; font-weight: 800; color: var(--purple); letter-spacing: -1px; line-height: 1; }
+  .ph-pct-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+  .ph-bar-wrap { width: 100px; height: 5px; background: var(--bg); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+  .ph-bar { height: 100%; background: var(--purple); border-radius: 3px; width: 82%; }
+
+  .ph-meta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .ph-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 13px; font-weight: 600; padding: 5px 12px;
+    border-radius: 100px; background: var(--bg); color: var(--text-secondary);
+  }
+
+  /* AI summary */
+  .ai-summary {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 24px 28px;
+    animation: fadeUp .4s .05s ease both;
+  }
+  .block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .block-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); letter-spacing: .05em; text-transform: uppercase; }
+  .btn-edit-block {
+    font-size: 12px; font-weight: 600; padding: 5px 12px; border-radius: 8px;
+    border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary);
+    cursor: pointer; transition: all .18s; font-family: 'Manrope',sans-serif;
+  }
+  .btn-edit-block:hover { border-color: var(--purple); color: var(--purple); }
+  .ai-summary-text { font-size: 14px; color: var(--text-secondary); line-height: 1.8; font-weight: 500; font-style: italic; }
+  .ai-summary-text b { color: var(--text-primary); font-style: normal; }
+
+  /* Profile blocks */
+  .profile-block {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 22px 28px;
+    animation: fadeUp .4s ease both;
+  }
+  .block-weight { font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 3px 8px; border-radius: 100px; }
+
+  /* Tags */
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .tag {
+    font-size: 13px; font-weight: 600; padding: 5px 13px;
+    border-radius: 100px; background: var(--purple-soft); color: var(--purple);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .tag.required { background: var(--purple); color: #fff; }
+  .tag.required::before { content: '✦'; font-size: 9px; }
+  .tag.soft { background: var(--success-bg); color: var(--success); }
+  .tag.neutral { background: var(--bg); color: var(--text-secondary); }
+  .tag.danger { background: var(--error-bg); color: var(--error); }
+  .tag.warning { background: var(--warning-bg); color: var(--warning); }
+
+  /* Skill with direction */
+  .skill-item { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .skill-name { font-size: 14px; font-weight: 700; }
+  .skill-dir { font-size: 12px; font-weight: 600; color: var(--purple); background: var(--purple-soft); padding: 2px 9px; border-radius: 100px; }
+  .skill-level { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+  .skill-level.required { background: var(--purple); color: #fff; }
+  .skill-level.optional { background: var(--bg); color: var(--text-muted); }
+
+  /* Soft skill bars */
+  .soft-item { margin-bottom: 12px; }
+  .soft-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .soft-name { font-size: 13px; font-weight: 600; }
+  .soft-val { font-size: 12px; font-weight: 700; color: var(--purple); }
+  .soft-bar-wrap { height: 5px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .soft-bar { height: 100%; background: var(--purple); border-radius: 3px; transition: width .5s ease; }
+
+  /* Edit mode */
+  .edit-input {
+    width: 100%; padding: 9px 13px; border-radius: 10px;
+    border: 1.5px solid var(--border); font-size: 13px;
+    font-family: 'Manrope',sans-serif; font-weight: 500;
+    color: var(--text-primary); outline: none;
+    transition: border-color .2s; margin-top: 8px; background: var(--bg);
+  }
+  .edit-input:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 3px rgba(107,78,255,.08); }
+  .edit-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .btn-save-edit { padding: 7px 16px; border-radius: 9px; font-size: 13px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; }
+  .btn-cancel-edit { padding: 7px 14px; border-radius: 9px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; }
+
+  /* ── RIGHT COLUMN ── */
+  .right-col { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 136px; }
+
+  /* Actions card */
+  .actions-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 24px;
+    animation: fadeUp .4s .1s ease both;
+  }
+  .actions-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; letter-spacing: -.3px; }
+  .actions-card p { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 20px; line-height: 1.5; }
+  .btn-match {
+    width: 100%; padding: 14px; border-radius: 13px; font-size: 15px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s; margin-bottom: 10px;
+    box-shadow: 0 4px 16px rgba(107,78,255,.28);
+  }
+  .btn-match:hover { background: var(--purple-light); transform: translateY(-1px); }
+  .btn-secondary {
+    width: 100%; padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: var(--white);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; margin-bottom: 8px;
+  }
+  .btn-secondary:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-secondary:last-child { margin-bottom: 0; }
+
+  /* Share card */
+  .share-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 22px 24px;
+    animation: fadeUp .4s .15s ease both;
+  }
+  .share-card h4 { font-size: 14px; font-weight: 800; margin-bottom: 14px; }
+  .share-option { border: 1.5px solid var(--border); border-radius: 13px; padding: 13px 15px; margin-bottom: 10px; }
+  .share-option:last-of-type { margin-bottom: 0; }
+  .share-option-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .share-option-name { font-size: 13px; font-weight: 700; }
+  .share-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+  .share-badge.pw { background: var(--warning-bg); color: var(--warning); }
+  .share-badge.open { background: var(--success-bg); color: var(--success); }
+  .share-desc { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; line-height: 1.5; }
+  .share-link-row { display: flex; gap: 6px; }
+  .share-link-input { flex: 1; padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--border); font-size: 11px; font-family: 'Manrope',sans-serif; color: var(--text-muted); background: var(--bg); outline: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn-copy { padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; transition: all .2s; white-space: nowrap; }
+  .btn-copy:hover { background: var(--purple-light); }
+  .btn-copy.copied { background: var(--success); }
+  .pw-field { display: flex; gap: 6px; margin-top: 8px; }
+  .pw-input { flex: 1; padding: 7px 10px; border-radius: 8px; border: 1.5px solid var(--border); font-size: 12px; font-family: 'Manrope',sans-serif; outline: none; transition: border-color .2s; background: var(--white); }
+  .pw-input:focus { border-color: var(--purple); }
+  .btn-pw-save { padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; white-space: nowrap; }
+  .btn-pw-save:hover { border-color: var(--success); color: var(--success); }
+  .btn-pw-save.saved { border-color: var(--success); color: var(--success); background: var(--success-bg); }
+
+  /* Completeness hint */
+  .completeness-hint {
+    background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
+    border-radius: 14px; padding: 14px 16px;
+    animation: fadeUp .4s .2s ease both;
+  }
+  .ch-title { font-size: 13px; font-weight: 700; color: var(--purple); margin-bottom: 8px; }
+  .ch-item { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: var(--text-secondary); margin-bottom: 5px; }
+  .ch-item:last-child { margin-bottom: 0; }
+  .ch-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--purple-mid); flex-shrink: 0; }
+  .ch-dot.done { background: var(--success); }
+
+  /* Modals */
+  .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,26,46,.5); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box { background: var(--white); border-radius: 20px; padding: 32px; width: 100%; max-width: 460px; box-shadow: 0 24px 64px rgba(26,26,46,.15); transform: translateY(12px) scale(.97); transition: transform .25s ease; }
+  .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.4px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-bottom: 20px; line-height: 1.6; }
+  .modal-input { width: 100%; padding: 11px 14px; border-radius: 11px; border: 1.5px solid var(--border); font-size: 14px; font-family: 'Manrope',sans-serif; outline: none; transition: border-color .2s; margin-bottom: 12px; }
+  .modal-input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(107,78,255,.08); }
+  .modal-actions { display: flex; gap: 10px; }
+  .btn-modal-ok { flex: 1; padding: 12px; border-radius: 11px; font-size: 14px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; transition: all .2s; }
+  .btn-modal-ok:hover { background: var(--purple-light); }
+  .btn-modal-cancel { padding: 12px 20px; border-radius: 11px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-modal-cancel:hover { border-color: var(--text-secondary); }
+
+  @media(max-width:900px){
+    nav{padding:0 20px} .progress-wrap{padding:0 20px}
+    .page{grid-template-columns:1fr;padding:24px 20px 80px}
+    .right-col{position:static}
+  }
+
+  /* Note inline */
+  .note-inline { background: #FFFBEB; border: 1.5px solid #FDE68A; border-radius: 14px; padding: 12px 16px; display: flex; align-items: flex-start; gap: 10px; cursor: pointer; transition: all .2s; }
+  .note-inline:hover { border-color: #F59E0B; }
+  .note-inline-icon { font-size: 15px; flex-shrink: 0; }
+  .note-inline-body { flex: 1; min-width: 0; }
+  .note-inline-label { font-size: 10px; font-weight: 700; color: #F59E0B; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 3px; }
+  .note-inline-preview { font-size: 13px; font-weight: 500; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .note-inline-empty { color: var(--text-muted); font-style: italic; }
+  .note-inline-edit { font-size: 11px; font-weight: 700; color: #F59E0B; flex-shrink: 0; opacity: .7; }
+  .note-modal-edit { width: 100%; padding: 12px 14px; border-radius: 11px; border: 1.5px solid var(--border); font-size: 14px; font-family: 'Manrope',sans-serif; font-weight: 500; color: var(--text-primary); outline: none; resize: vertical; min-height: 140px; line-height: 1.65; margin-bottom: 12px; background: var(--white); transition: border-color .2s; }
+  .note-modal-edit:focus { border-color: #F59E0B; }
+  .note-saved-hint { font-size: 12px; font-weight: 600; color: var(--success); opacity: 0; transition: opacity .3s; }
+  .note-saved-hint.show { opacity: 1; }
+  /* Task block */
+  .task-block { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; overflow: hidden; }
+  .task-block-header { padding: 14px 18px 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+  .task-block-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: .05em; text-transform: uppercase; }
+  .task-tabs { display: flex; border-bottom: 1px solid var(--border); }
+  .task-tab { flex: 1; padding: 9px 6px; font-size: 12px; font-weight: 600; font-family: 'Manrope',sans-serif; border: none; background: none; color: var(--text-secondary); cursor: pointer; transition: all .18s; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .task-tab:hover { color: var(--text-primary); }
+  .task-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+  .task-pane { display: none; padding: 14px 18px; }
+  .task-pane.active { display: block; }
+  .task-type-desc { font-size: 12px; color: var(--text-secondary); font-weight: 500; line-height: 1.5; margin-bottom: 8px; }
+  .task-textarea { width: 100%; padding: 9px 12px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 13px; font-family: 'Manrope',sans-serif; font-weight: 500; color: var(--text-primary); outline: none; resize: vertical; min-height: 80px; line-height: 1.6; transition: border-color .2s; background: var(--bg); }
+  .task-textarea:focus { border-color: var(--purple); background: var(--white); }
+  .task-textarea::placeholder { color: var(--text-muted); }
+  .task-or-divider { display: flex; align-items: center; gap: 8px; margin: 7px 0; font-size: 11px; font-weight: 700; color: var(--text-muted); }
+  .task-or-divider::before, .task-or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .task-file-btn { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; font-family: 'Manrope',sans-serif; border: 1.5px dashed var(--border); background: var(--bg); color: var(--text-secondary); cursor: pointer; transition: all .18s; }
+  .task-file-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-soft); }
+  .task-file-attached { display: none; align-items: center; gap: 7px; padding: 4px 10px; border-radius: 8px; background: var(--success-bg); border: 1.5px solid #6EE7B7; font-size: 12px; font-weight: 600; color: var(--success); margin-top: 6px; }
+  .task-file-attached.show { display: inline-flex; }
+  .task-file-remove { background: none; border: none; cursor: pointer; color: var(--success); font-size: 13px; padding: 0; }
+  .task-meta-row { display: flex; gap: 8px; margin-top: 9px; }
+  .task-meta-field { flex: 1; }
+  .task-meta-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; }
+  .task-meta-input { width: 100%; padding: 7px 10px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 12px; font-family: 'Manrope',sans-serif; outline: none; background: var(--bg); color: var(--text-primary); }
+  .task-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+  .task-saved { font-size: 12px; font-weight: 600; color: var(--success); opacity: 0; transition: opacity .3s; }
+  .task-saved.show { opacity: 1; }
+  .btn-task-save { padding: 8px 14px; border-radius: 9px; font-size: 12px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; transition: all .2s; }
+  .btn-task-save:hover { background: var(--purple-light); }
+  .task-status-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 100px; }
+  .task-status-badge.active { background: var(--success-bg); color: var(--success); }
+  .task-status-badge.empty { background: var(--bg); color: var(--text-muted); border: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-right">
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="step done"><div class="step-num">✓</div><span>Брифинг</span></div>
+  <div class="step-line done"></div>
+  <div class="step done"><div class="step-num">✓</div><span>Режим</span></div>
+  <div class="step-line done"></div>
+  <div class="step done"><div class="step-num">✓</div><span>Интервью с ИИ</span></div>
+  <div class="step-line done"></div>
+  <div class="step active"><div class="step-num">4</div><span>Профиль готов</span></div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left-col">
+
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="ph-top">
+        <div class="ph-role-wrap">
+          <div class="ph-role-label">Профиль кандидата</div>
+          <div class="ph-role" id="ph-role">Python Backend Developer</div>
+          <div class="ph-role-ai" onclick="openRenameModal()">✦ предложено ИИ · изменить</div>
+        </div>
+        <div class="ph-completeness">
+          <div class="ph-pct">82%</div>
+          <div class="ph-pct-label">полнота профиля</div>
+          <div class="ph-bar-wrap"><div class="ph-bar"></div></div>
+        </div>
+      </div>
+      <div class="ph-meta">
+        <span class="ph-tag">🎯 Запустить новый продукт</span>
+        <span class="ph-tag">📅 Планово · ~3 месяца</span>
+        <span class="ph-tag">👨‍💻 Руководитель отдела</span>
+        <span class="ph-tag" style="color:var(--text-muted);font-size:12px">Создан 17 марта 2026</span>
+      </div>
+    </div>
+
+    <!-- Note inline -->
+    <div class="note-inline" onclick="openNoteModal()">
+      <div class="note-inline-icon">📝</div>
+      <div class="note-inline-body">
+        <div class="note-inline-label">Заметка</div>
+        <div class="note-inline-preview" id="note-inline-preview"><span class="note-inline-empty">Нажмите чтобы добавить заметку о вакансии...</span></div>
+      </div>
+      <div class="note-inline-edit">✎</div>
+    </div>
+
+    <!-- AI Summary -->
+    <div class="ai-summary">
+      <div class="block-header">
+        <div class="block-title">Резюме от ИИ</div>
+        <button class="btn-edit-block" onclick="openEditSummary()">Редактировать</button>
+      </div>
+      <div class="ai-summary-text" id="ai-summary-text">
+        Ищем <b>опытного backend-разработчика</b> для запуска нового API мобильного приложения. Человек должен уметь <b>работать самостоятельно</b> с минимальным онбордингом — дедлайн через 3 месяца не оставляет времени на раскачку. Обязателен <b>Python (backend направление)</b>, опыт с REST API и PostgreSQL. Важна инициативность и готовность принимать технические решения без постоянного согласования.
+      </div>
+    </div>
+
+    <!-- Hard Skills -->
+    <div class="profile-block" style="animation-delay:.08s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Hard Skills</div>
+          <div class="block-weight">35%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('skills')">Редактировать</button>
+      </div>
+
+      <div id="skills-view">
+        <div style="margin-bottom:6px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:8px">ОБЯЗАТЕЛЬНЫЕ ✦</div>
+          <div class="skill-item">
+            <span class="skill-name">Python</span>
+            <span class="skill-dir">backend · REST API</span>
+            <span class="skill-level required">Обязательно</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">PostgreSQL</span>
+            <span class="skill-dir">реляционные БД</span>
+            <span class="skill-level required">Обязательно</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">FastAPI / Django</span>
+            <span class="skill-dir">web frameworks</span>
+            <span class="skill-level required">Обязательно</span>
+          </div>
+        </div>
+        <div style="margin-top:14px">
+          <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.04em;margin-bottom:8px">ЖЕЛАТЕЛЬНЫЕ</div>
+          <div class="skill-item">
+            <span class="skill-name">Redis</span>
+            <span class="skill-dir">кэширование</span>
+            <span class="skill-level optional">Желательно</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Docker</span>
+            <span class="skill-dir">контейнеризация</span>
+            <span class="skill-level optional">Желательно</span>
+          </div>
+          <div class="skill-item">
+            <span class="skill-name">Git</span>
+            <span class="skill-dir">версионирование</span>
+            <span class="skill-level optional">Желательно</span>
+          </div>
+        </div>
+      </div>
+
+      <div id="skills-edit" style="display:none">
+        <input class="edit-input" placeholder="Добавить навык (например: Kubernetes · DevOps · обязательно)" />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('skills')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('skills')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Experience -->
+    <div class="profile-block" style="animation-delay:.1s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Опыт</div>
+          <div class="block-weight">20%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('exp')">Редактировать</button>
+      </div>
+      <div id="exp-view">
+        <div class="tags-wrap">
+          <span class="tag neutral">3–5 лет опыта</span>
+          <span class="tag neutral">Запуск сервисов с нуля</span>
+          <span class="tag neutral">Backend системы</span>
+          <span class="tag neutral">Высокая нагрузка — плюс</span>
+          <span class="tag neutral">Стартап или продуктовая компания</span>
+        </div>
+      </div>
+      <div id="exp-edit" style="display:none">
+        <input class="edit-input" placeholder="Добавить требование к опыту..." />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('exp')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('exp')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Soft Skills -->
+    <div class="profile-block" style="animation-delay:.12s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Soft Skills</div>
+          <div class="block-weight">15%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('soft')">Редактировать</button>
+      </div>
+      <div id="soft-view">
+        <div class="soft-item">
+          <div class="soft-row"><span class="soft-name">Самостоятельность</span><span class="soft-val">5/5</span></div>
+          <div class="soft-bar-wrap"><div class="soft-bar" style="width:100%"></div></div>
+        </div>
+        <div class="soft-item">
+          <div class="soft-row"><span class="soft-name">Инициативность</span><span class="soft-val">4/5</span></div>
+          <div class="soft-bar-wrap"><div class="soft-bar" style="width:80%"></div></div>
+        </div>
+        <div class="soft-item">
+          <div class="soft-row"><span class="soft-name">Работа в условиях неопределённости</span><span class="soft-val">5/5</span></div>
+          <div class="soft-bar-wrap"><div class="soft-bar" style="width:100%"></div></div>
+        </div>
+        <div class="soft-item">
+          <div class="soft-row"><span class="soft-name">Коммуникация с командой</span><span class="soft-val">3/5</span></div>
+          <div class="soft-bar-wrap"><div class="soft-bar" style="width:60%"></div></div>
+        </div>
+      </div>
+      <div id="soft-edit" style="display:none">
+        <input class="edit-input" placeholder="Добавить soft skill и приоритет (1-5)..." />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('soft')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('soft')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Psychotype -->
+    <div class="profile-block" style="animation-delay:.14s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Психотип</div>
+          <div class="block-weight">10%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('psych')">Редактировать</button>
+      </div>
+      <div id="psych-view">
+        <div class="tags-wrap" style="margin-bottom:12px">
+          <span class="tag soft">Технический лидер</span>
+          <span class="tag soft">Решает проблемы системно</span>
+          <span class="tag soft">Мотивирован сложными задачами</span>
+          <span class="tag soft">Не нуждается в микроменеджменте</span>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--error);letter-spacing:.04em;margin-bottom:8px">АНТИПАТТЕРН — жёсткий фильтр</div>
+        <div class="tags-wrap">
+          <span class="tag danger">Требует постоянного контроля</span>
+          <span class="tag danger">Избегает ответственности за решения</span>
+        </div>
+      </div>
+      <div id="psych-edit" style="display:none">
+        <input class="edit-input" placeholder="Добавить черту психотипа или антипаттерн..." />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('psych')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('psych')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conditions -->
+    <div class="profile-block" style="animation-delay:.16s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Условия</div>
+          <div class="block-weight">15%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('cond')">Редактировать</button>
+      </div>
+      <div id="cond-view">
+        <div class="tags-wrap">
+          <span class="tag neutral">💰 4 000–6 000 €</span>
+          <span class="tag neutral">🌍 Remote / Гибрид</span>
+          <span class="tag neutral">⏱ Планово · ~3 мес</span>
+          <span class="tag warning">🔥 Онбординг быстрый</span>
+        </div>
+      </div>
+      <div id="cond-edit" style="display:none">
+        <input class="edit-input" placeholder="Изменить условия (зарплата, формат, геолокация)..." />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('cond')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('cond')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context -->
+    <div class="profile-block" style="animation-delay:.18s">
+      <div class="block-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="block-title">Контекст и культура</div>
+          <div class="block-weight">5%</div>
+        </div>
+        <button class="btn-edit-block" onclick="toggleEdit('ctx')">Редактировать</button>
+      </div>
+      <div id="ctx-view">
+        <div class="tags-wrap">
+          <span class="tag neutral">Небольшая команда (2–5 человек)</span>
+          <span class="tag neutral">Автономная работа над направлением</span>
+          <span class="tag neutral">Быстрые итерации</span>
+          <span class="tag neutral">Плоская иерархия</span>
+        </div>
+      </div>
+      <div id="ctx-edit" style="display:none">
+        <input class="edit-input" placeholder="Описать контекст команды или культуру..." />
+        <div class="edit-actions">
+          <button class="btn-save-edit" onclick="saveEdit('ctx')">Сохранить</button>
+          <button class="btn-cancel-edit" onclick="toggleEdit('ctx')">Отмена</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- Actions -->
+    <div class="actions-card">
+      <h3>Профиль готов</h3>
+      <p>Запустите подбор — алгоритм найдёт совпадения по всем 6 блокам</p>
+      <button class="btn-match" onclick="goToMatching()">⚡ Найти кандидатов</button>
+      <button class="btn-secondary" onclick="openEditSummary()">✎ Уточнить с ИИ</button>
+      <button class="btn-secondary" onclick="window.location.href='yoffer-dashboard.html'">← Сохранить черновик</button>
+    </div>
+
+    <!-- Task block -->
+    <div class="task-block">
+      <div class="task-block-header">
+        <div class="task-block-title">📋 Задания</div>
+        <span class="task-status-badge empty" id="task-status-badge">Не добавлено</span>
+      </div>
+      <div class="task-tabs">
+        <button class="task-tab active" onclick="switchTaskTab('public',this)">🌐 Публичный кейс</button>
+        <button class="task-tab" onclick="switchTaskTab('personal',this)">🎯 Персональное</button>
+      </div>
+      <div class="task-pane active" id="task-pane-public">
+        <div class="task-type-desc">Любой подходящий кандидат сможет решить этот кейс. Лучшие решения → Уровень 1.</div>
+        <textarea class="task-textarea" id="public-task-text" placeholder="Опишите реальную бизнес-задачу..."></textarea>
+        <div class="task-or-divider">или прикрепите файл</div>
+        <button class="task-file-btn" onclick="document.getElementById('pub-file').click()">📎 PDF или Word</button>
+        <input type="file" id="pub-file" accept=".pdf,.doc,.docx" style="display:none" onchange="attachTaskFile(this,'public')"/>
+        <div class="task-file-attached" id="public-file-attached"><span id="public-file-name"></span><button class="task-file-remove" onclick="removeTaskFile('public')">✕</button></div>
+        <div class="task-meta-row">
+          <div class="task-meta-field"><div class="task-meta-label">Срок</div><select class="task-meta-input"><option>1 день</option><option selected>3 дня</option><option>5 дней</option><option>7 дней</option></select></div>
+          <div class="task-meta-field"><div class="task-meta-label">Формат</div><select class="task-meta-input"><option>Текст</option><option selected>Техническое решение</option><option>PDF</option><option>Репозиторий</option></select></div>
+        </div>
+        <div class="task-footer"><span class="task-saved" id="public-task-saved">✓ Сохранено</span><button class="btn-task-save" onclick="saveTask('public')">Сохранить кейс</button></div>
+      </div>
+      <div class="task-pane" id="task-pane-personal">
+        <div class="task-type-desc">Шаблон для ручной отправки конкретному кандидату с его карточки.</div>
+        <textarea class="task-textarea" id="personal-task-text" placeholder="Опишите персональное задание..."></textarea>
+        <div class="task-or-divider">или прикрепите файл</div>
+        <button class="task-file-btn" onclick="document.getElementById('per-file').click()">📎 PDF или Word</button>
+        <input type="file" id="per-file" accept=".pdf,.doc,.docx" style="display:none" onchange="attachTaskFile(this,'personal')"/>
+        <div class="task-file-attached" id="personal-file-attached"><span id="personal-file-name"></span><button class="task-file-remove" onclick="removeTaskFile('personal')">✕</button></div>
+        <div class="task-meta-row">
+          <div class="task-meta-field"><div class="task-meta-label">Срок</div><select class="task-meta-input"><option>1 день</option><option>2 дня</option><option selected>3 дня</option><option>5 дней</option></select></div>
+          <div class="task-meta-field"><div class="task-meta-label">Формат</div><select class="task-meta-input"><option selected>Репозиторий</option><option>Текст</option><option>PDF</option></select></div>
+        </div>
+        <div class="task-footer"><span class="task-saved" id="personal-task-saved">✓ Сохранено</span><button class="btn-task-save" onclick="saveTask('personal')">Сохранить шаблон</button></div>
+      </div>
+    </div>
+
+    <!-- Share -->
+    <div class="share-card">
+      <h4>Поделиться профилем</h4>
+
+      <div class="share-option">
+        <div class="share-option-top">
+          <div class="share-option-name">✎ С редактированием</div>
+          <span class="share-badge pw">Пароль</span>
+        </div>
+        <div class="share-desc">Получатель откроет ссылку и введёт пароль — без регистрации</div>
+        <div class="share-link-row">
+          <input class="share-link-input" value="yoffer.app/p/py-back-x7k2/edit" readonly id="link-edit" />
+          <button class="btn-copy" onclick="copyLink('link-edit', this)">Копировать</button>
+        </div>
+        <div class="pw-field">
+          <input class="pw-input" id="pw-edit" placeholder="Пароль для ссылки..." type="text" />
+          <button class="btn-pw-save" id="btn-pw-save" onclick="savePw()">Сохранить</button>
+        </div>
+      </div>
+
+      <div class="share-option">
+        <div class="share-option-top">
+          <div class="share-option-name">👁 Только просмотр</div>
+          <span class="share-badge open">Без пароля</span>
+        </div>
+        <div class="share-desc">Видит профиль и кандидатов, не может менять</div>
+        <div class="share-link-row">
+          <input class="share-link-input" value="yoffer.app/p/py-back-x7k2/view" readonly id="link-view" />
+          <button class="btn-copy" onclick="copyLink('link-view', this)">Копировать</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completeness hints -->
+    <div class="completeness-hint">
+      <div class="ch-title">Как улучшить профиль до 100%</div>
+      <div class="ch-item"><div class="ch-dot done"></div>Hard skills заполнены</div>
+      <div class="ch-item"><div class="ch-dot done"></div>Опыт указан</div>
+      <div class="ch-item"><div class="ch-dot done"></div>Soft skills расставлены</div>
+      <div class="ch-item"><div class="ch-dot done"></div>Условия заданы</div>
+      <div class="ch-item"><div class="ch-dot"></div>Добавьте тестовое задание</div>
+      <div class="ch-item"><div class="ch-dot"></div>Опишите примеры задач</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Note -->
+<div class="modal-overlay" id="modal-note" onclick="closeModal('modal-note', event)">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-title">Заметка о вакансии</div>
+    <div class="modal-sub">Внутренняя заметка — видна только вашей команде.</div>
+    <textarea class="note-modal-edit" id="vacancy-note" placeholder="Например: вакансия открыта по запросу CTO..."></textarea>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <span class="note-saved-hint" id="note-saved-hint">✓ Сохранено</span>
+      <div style="display:flex;gap:8px">
+        <button class="btn-modal-cancel" onclick="closeModal('modal-note')">Отмена</button>
+        <button class="btn-modal-ok" onclick="saveNote()">Сохранить</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Rename role -->
+<div class="modal-overlay" id="modal-rename" onclick="closeModal('modal-rename', event)">
+  <div class="modal-box">
+    <div class="modal-title">Название роли</div>
+    <div class="modal-sub">ИИ предложил это название на основе собранных данных. Вы можете изменить его.</div>
+    <input class="modal-input" id="modal-role-input" value="Python Backend Developer" placeholder="Введите название роли..." />
+    <div class="modal-actions">
+      <button class="btn-modal-ok" onclick="saveRoleName()">Сохранить</button>
+      <button class="btn-modal-cancel" onclick="closeModal('modal-rename')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Edit summary -->
+<div class="modal-overlay" id="modal-summary" onclick="closeModal('modal-summary', event)">
+  <div class="modal-box">
+    <div class="modal-title">Редактировать резюме</div>
+    <div class="modal-sub">Это резюме видит кандидат при отклике. Отредактируйте если ИИ неточно передал суть.</div>
+    <textarea class="modal-input" id="modal-summary-input" rows="5" style="resize:vertical;line-height:1.6">Ищем опытного backend-разработчика для запуска нового API мобильного приложения. Человек должен уметь работать самостоятельно с минимальным онбордингом — дедлайн через 3 месяца не оставляет времени на раскачку. Обязателен Python (backend направление), опыт с REST API и PostgreSQL. Важна инициативность и готовность принимать технические решения без постоянного согласования.</textarea>
+    <div class="modal-actions">
+      <button class="btn-modal-ok" onclick="saveSummary()">Сохранить</button>
+      <button class="btn-modal-cancel" onclick="closeModal('modal-summary')">Отмена</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Edit blocks toggle
+function toggleEdit(id) {
+  const view = document.getElementById(id + '-view');
+  const edit = document.getElementById(id + '-edit');
+  const isEditing = edit.style.display !== 'none';
+  view.style.display = isEditing ? 'block' : 'none';
+  edit.style.display = isEditing ? 'none' : 'block';
+  if (!isEditing) edit.querySelector('input, textarea').focus();
+}
+
+function saveEdit(id) {
+  const input = document.getElementById(id + '-edit').querySelector('input, textarea');
+  const val = input.value.trim();
+  if (val) {
+    // In real app — add tag to the block
+    showSaveToast();
+  }
+  toggleEdit(id);
+}
+
+function showSaveToast() {
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 22px;border-radius:100px;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;z-index:999;animation:fadeUp .3s ease';
+  toast.textContent = 'Изменения сохранены';
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2200);
+}
+
+// Share
+function copyLink(id, btn) {
+  const val = 'https://' + document.getElementById(id).value;
+  navigator.clipboard.writeText(val).catch(() => {});
+  btn.textContent = 'Скопировано ✓';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 2000);
+}
+
+function savePw() {
+  const val = document.getElementById('pw-edit').value.trim();
+  if (!val) return;
+  const btn = document.getElementById('btn-pw-save');
+  btn.textContent = 'Сохранён ✓';
+  btn.classList.add('saved');
+  setTimeout(() => { btn.textContent = 'Сохранить'; btn.classList.remove('saved'); }, 2000);
+}
+
+// Modals
+function openRenameModal() {
+  document.getElementById('modal-rename').classList.add('show');
+  setTimeout(() => document.getElementById('modal-role-input').focus(), 100);
+}
+
+function openEditSummary() {
+  document.getElementById('modal-summary').classList.add('show');
+  setTimeout(() => document.getElementById('modal-summary-input').focus(), 100);
+}
+
+function closeModal(id, e) {
+  if (!e || e.target === document.getElementById(id)) {
+    document.getElementById(id).classList.remove('show');
+  }
+}
+
+function saveRoleName() {
+  const val = document.getElementById('modal-role-input').value.trim();
+  if (val) {
+    document.getElementById('ph-role').textContent = val;
+    // Hide "предложено ИИ" badge if user manually renamed
+    document.querySelector('.ph-role-ai').textContent = '✎ изменить название';
+    showSaveToast();
+  }
+  closeModal('modal-rename');
+}
+
+function saveSummary() {
+  const val = document.getElementById('modal-summary-input').value.trim();
+  if (val) {
+    document.getElementById('ai-summary-text').innerHTML = val;
+    showSaveToast();
+  }
+  closeModal('modal-summary');
+}
+
+function goToMatching() {
+  window.location.href = 'yoffer-vacancy.html';
+}
+
+// ── NOTE ──
+function openNoteModal() {
+  const saved = localStorage.getItem('yoffer_vacancy_note') || '';
+  document.getElementById('vacancy-note').value = saved;
+  document.getElementById('note-saved-hint').classList.remove('show');
+  document.getElementById('modal-note').classList.add('show');
+  setTimeout(() => document.getElementById('vacancy-note').focus(), 100);
+}
+function saveNote() {
+  const val = document.getElementById('vacancy-note').value.trim();
+  localStorage.setItem('yoffer_vacancy_note', val);
+  updateNotePreview(val);
+  const hint = document.getElementById('note-saved-hint');
+  hint.classList.add('show');
+  setTimeout(() => { hint.classList.remove('show'); closeModal('modal-note'); }, 1200);
+}
+function updateNotePreview(note) {
+  const el = document.getElementById('note-inline-preview');
+  if (note) {
+    const p = note.length > 90 ? note.substring(0, 90) + '...' : note;
+    el.innerHTML = '<span style="color:var(--text-secondary)">' + p + '</span>';
+  } else {
+    el.innerHTML = '<span class="note-inline-empty">Нажмите чтобы добавить заметку о вакансии...</span>';
+  }
+}
+// ── TASK ──
+function switchTaskTab(tab, btn) {
+  document.querySelectorAll('.task-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.task-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('task-pane-' + tab).classList.add('active');
+}
+function saveTask(type) {
+  const text = document.getElementById(type + '-task-text').value.trim();
+  if (text) localStorage.setItem('yoffer_task_' + type, text);
+  const badge = document.getElementById('task-status-badge');
+  badge.textContent = 'Добавлено ✓'; badge.className = 'task-status-badge active';
+  const hint = document.getElementById(type + '-task-saved');
+  hint.classList.add('show'); setTimeout(() => hint.classList.remove('show'), 2000);
+}
+function attachTaskFile(input, type) {
+  const file = input.files[0]; if (!file) return;
+  document.getElementById(type + '-file-name').textContent = file.name;
+  document.getElementById(type + '-file-attached').classList.add('show');
+  localStorage.setItem('yoffer_task_file_' + type, file.name);
+  const badge = document.getElementById('task-status-badge');
+  badge.textContent = 'Добавлено ✓'; badge.className = 'task-status-badge active';
+}
+function removeTaskFile(type) {
+  document.getElementById(type + '-file-attached').classList.remove('show');
+  localStorage.removeItem('yoffer_task_file_' + type);
+}
+document.addEventListener('DOMContentLoaded', () => {
+  const note = localStorage.getItem('yoffer_vacancy_note') || '';
+  updateNotePreview(note);
+  const pub = localStorage.getItem('yoffer_task_public') || '';
+  const per = localStorage.getItem('yoffer_task_personal') || '';
+  if (pub) document.getElementById('public-task-text').value = pub;
+  if (per) document.getElementById('personal-task-text').value = per;
+  const pubFile = localStorage.getItem('yoffer_task_file_public');
+  const perFile = localStorage.getItem('yoffer_task_file_personal');
+  if (pubFile) { document.getElementById('public-file-name').textContent = pubFile; document.getElementById('public-file-attached').classList.add('show'); }
+  if (perFile) { document.getElementById('personal-file-name').textContent = perFile; document.getElementById('personal-file-attached').classList.add('show'); }
+  if (pub || per || pubFile || perFile) { const b = document.getElementById('task-status-badge'); b.textContent = 'Добавлено ✓'; b.className = 'task-status-badge active'; }
+});
+
+</script>
+</body>
+</html>

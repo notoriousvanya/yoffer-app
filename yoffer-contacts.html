@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Контакты</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF; --purple-light: #8B72FF; --purple-soft: #F0EDFF; --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E; --text-secondary: #6B7280; --text-muted: #9CA3AF;
+    --bg: #F7F7FA; --white: #FFFFFF; --border: #E8E8F0;
+    --success: #10B981; --success-bg: #ECFDF5;
+    --warning: #F59E0B; --warning-bg: #FFFBEB;
+    --error: #EF4444; --error-bg: #FEF2F2;
+    --blue: #3B82F6; --blue-bg: #EFF6FF;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  nav { background: var(--white); border-bottom: 1px solid var(--border); padding: 0 48px; height: 64px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: all .18s; cursor: pointer; border: none; background: none; font-family: 'Manrope',sans-serif; }
+  .nav-link:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-link.active { color: var(--purple); background: var(--purple-soft); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+
+  .page-header { background: var(--white); border-bottom: 1px solid var(--border); padding: 24px 48px; position: sticky; top: 64px; z-index: 40; }
+  .ph-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .ph-title { font-size: 22px; font-weight: 800; letter-spacing: -.5px; }
+  .ph-sub { font-size: 13px; color: var(--text-muted); font-weight: 500; margin-top: 2px; }
+  .search-wrap { position: relative; }
+  .search-input { padding: 9px 14px 9px 38px; border-radius: 11px; border: 1.5px solid var(--border); font-size: 14px; font-family: 'Manrope',sans-serif; font-weight: 500; color: var(--text-primary); outline: none; background: var(--bg); transition: all .2s; width: 240px; }
+  .search-input:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 3px rgba(107,78,255,.08); width: 280px; }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; color: var(--text-muted); pointer-events: none; }
+
+  .page { max-width: 1160px; margin: 0 auto; padding: 32px 48px 80px; }
+
+  /* Stats */
+  .stats-row { display: flex; gap: 12px; margin-bottom: 28px; }
+  .stat-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px 20px; flex: 1; animation: fadeUp .35s ease both; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+  .sc-num { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1; }
+  .sc-lbl { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+  .sc-delta { font-size: 11px; font-weight: 700; margin-top: 4px; }
+  .sc-delta.up { color: var(--success); }
+  .sc-delta.flat { color: var(--text-muted); }
+
+  /* Filters */
+  .filters-row { display: flex; gap: 8px; align-items: center; margin-bottom: 22px; flex-wrap: wrap; }
+
+  /* Vacancy dropdown */
+  .vac-dropdown-wrap { position: relative; }
+  .vac-dropdown-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer;
+    transition: all .18s; min-width: 160px; justify-content: space-between;
+  }
+  .vac-dropdown-btn:hover, .vac-dropdown-btn.open { border-color: var(--purple); color: var(--purple); }
+  .vac-dropdown-btn.has-value { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .vac-chevron { font-size: 10px; transition: transform .2s; flex-shrink: 0; }
+  .vac-dropdown-btn.open .vac-chevron { transform: rotate(180deg); }
+  .vac-dropdown-panel {
+    position: absolute; top: calc(100% + 6px); left: 0; z-index: 200;
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 14px; box-shadow: 0 8px 32px rgba(0,0,0,.1);
+    width: 280px; overflow: hidden; display: none;
+  }
+  .vac-dropdown-panel.show { display: block; }
+  .vac-search-wrap { padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  .vac-search-input {
+    width: 100%; padding: 8px 12px; border-radius: 9px;
+    border: 1.5px solid var(--border); font-size: 13px;
+    font-family: 'Manrope',sans-serif; font-weight: 500; outline: none;
+    background: var(--bg); color: var(--text-primary); transition: border-color .2s;
+  }
+  .vac-search-input:focus { border-color: var(--purple); background: var(--white); }
+  .vac-list { max-height: 240px; overflow-y: auto; padding: 6px; }
+  .vac-option {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 12px; border-radius: 9px; font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s; color: var(--text-secondary);
+  }
+  .vac-option:hover { background: var(--bg); color: var(--text-primary); }
+  .vac-option.selected { background: var(--purple-soft); color: var(--purple); }
+  .vac-option-count { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 100px; background: var(--bg); color: var(--text-muted); }
+  .vac-option.selected .vac-option-count { background: var(--purple-mid); color: var(--purple); }
+  .vac-empty { padding: 16px; text-align: center; font-size: 13px; color: var(--text-muted); font-weight: 500; }
+
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: .04em; }
+  .filter-btn { padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s; }
+  .filter-btn:hover { border-color: var(--purple-mid); }
+  .filter-btn.active { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .filter-sep { width: 1px; height: 24px; background: var(--border); flex-shrink: 0; }
+  .filter-select { padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary); cursor: pointer; outline: none; }
+  .total-label { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+  /* Kanban */
+  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: start; }
+  .kanban-col { display: flex; flex-direction: column; gap: 10px; }
+  .col-header { padding: 9px 14px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2px; }
+  .col-header-title { font-size: 13px; font-weight: 700; }
+  .col-header-count { font-size: 12px; font-weight: 800; padding: 2px 9px; border-radius: 100px; }
+  .col-invited .col-header { background: var(--purple-soft); }
+  .col-invited .col-header-title { color: var(--purple); }
+  .col-invited .col-header-count { background: var(--purple); color: #fff; }
+  .col-contact .col-header { background: var(--blue-bg); }
+  .col-contact .col-header-title { color: var(--blue); }
+  .col-contact .col-header-count { background: var(--blue); color: #fff; }
+  .col-task .col-header { background: var(--warning-bg); }
+  .col-task .col-header-title { color: var(--warning); }
+  .col-task .col-header-count { background: var(--warning); color: #fff; }
+  .col-declined .col-header { background: var(--bg); }
+  .col-declined .col-header-title { color: var(--text-muted); }
+  .col-declined .col-header-count { background: var(--border); color: var(--text-muted); }
+
+  /* Contact card */
+  .contact-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 16px; padding: 16px; cursor: pointer; transition: all .2s; animation: fadeUp .35s ease both; }
+  .contact-card:hover { border-color: var(--purple-mid); box-shadow: 0 4px 16px rgba(107,78,255,.08); transform: translateY(-1px); }
+  .contact-card.is-declined { opacity: .55; }
+  .cc-top { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 9px; }
+  .cc-ava { width: 40px; height: 40px; border-radius: 12px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; }
+  .cc-info { flex: 1; min-width: 0; }
+  .cc-name { font-size: 14px; font-weight: 800; letter-spacing: -.2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-role { font-size: 11px; color: var(--text-secondary); font-weight: 500; margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-pct { font-size: 12px; font-weight: 800; padding: 3px 8px; border-radius: 100px; flex-shrink: 0; }
+  .cc-pct.h { background: var(--success-bg); color: var(--success); }
+  .cc-pct.m { background: var(--warning-bg); color: var(--warning); }
+  .cc-pct.l { background: var(--bg); color: var(--text-muted); }
+  .cc-vacancy-tag { display: inline-block; font-size: 11px; font-weight: 600; color: var(--text-muted); background: var(--bg); padding: 3px 9px; border-radius: 100px; margin-bottom: 8px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cc-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 8px; border-top: 1px solid var(--border); }
+  .cc-skills { display: flex; gap: 4px; flex-wrap: wrap; }
+  .cc-skill { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 100px; background: var(--bg); color: var(--text-secondary); }
+  .cc-date { font-size: 11px; color: var(--text-muted); font-weight: 500; flex-shrink: 0; }
+  .empty-col { border: 2px dashed var(--border); border-radius: 14px; padding: 28px 16px; text-align: center; color: var(--text-muted); font-size: 12px; font-weight: 600; line-height: 1.6; }
+
+  /* Drawer */
+  .drawer-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(26,26,46,.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .drawer-overlay.show { opacity: 1; pointer-events: all; }
+  .drawer { position: fixed; top: 0; right: -500px; width: 460px; height: 100vh; background: var(--white); box-shadow: -8px 0 40px rgba(0,0,0,.12); z-index: 101; transition: right .3s cubic-bezier(.4,0,.2,1); display: flex; flex-direction: column; }
+  .drawer.open { right: 0; }
+  .d-header { padding: 24px 28px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; gap: 14px; flex-shrink: 0; }
+  .d-ava { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; color: #fff; flex-shrink: 0; }
+  .d-name { font-size: 19px; font-weight: 800; letter-spacing: -.4px; }
+  .d-role { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-top: 2px; }
+  .d-pct { font-size: 30px; font-weight: 800; letter-spacing: -1px; line-height: 1; text-align: right; }
+  .d-pct-lbl { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
+  .d-close { width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--text-muted); transition: all .18s; flex-shrink: 0; align-self: flex-start; }
+  .d-close:hover { border-color: var(--text-secondary); color: var(--text-primary); }
+  .d-body { flex: 1; overflow-y: auto; padding: 20px 28px; }
+  .d-section { margin-bottom: 20px; }
+  .d-section-title { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
+  .d-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .d-row:last-child { border-bottom: none; }
+  .d-key { color: var(--text-secondary); font-weight: 500; }
+  .d-val { font-weight: 700; text-align: right; }
+  .d-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .d-tag { font-size: 12px; font-weight: 600; padding: 4px 11px; border-radius: 100px; background: var(--purple-soft); color: var(--purple); }
+  .note-area { width: 100%; padding: 10px 13px; border-radius: 10px; border: 1.5px solid var(--border); font-size: 13px; font-family: 'Manrope',sans-serif; resize: none; outline: none; min-height: 80px; color: var(--text-primary); transition: border-color .2s; background: var(--bg); }
+  .note-area:focus { border-color: var(--purple); background: var(--white); }
+  .btn-save-note { padding: 7px 16px; border-radius: 9px; font-size: 12px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; margin-top: 8px; transition: background .2s; }
+  .btn-save-note:hover { background: var(--purple-light); }
+  .d-footer { padding: 16px 28px 24px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+  .btn-d-main { padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple); border: none; cursor: pointer; transition: all .2s; }
+  .btn-d-main:hover { background: var(--purple-light); }
+  .btn-d-main:disabled { opacity: .5; cursor: default; }
+  .btn-d-main:disabled:hover { background: var(--purple); }
+  .btn-d-sec { padding: 11px; border-radius: 12px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; background: var(--white); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-d-sec:hover { border-color: var(--purple); color: var(--purple); }
+
+  @media(max-width:1050px){ .kanban{grid-template-columns:1fr 1fr} }
+  @media(max-width:700px){ nav{padding:0 20px} .page-header{padding:16px 20px} .page{padding:24px 20px 80px} .kanban{grid-template-columns:1fr} .drawer{width:100%;right:-100%} .stats-row{flex-wrap:wrap} }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-links">
+    <button class="nav-link" onclick="window.location.href='yoffer-dashboard.html'">Вакансии</button>
+    <button class="nav-link active">Контакты</button>
+    <button class="nav-link" onclick="location.href='yoffer-settings.html'">Настройки</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="ph-row">
+    <div>
+      <div class="ph-title">Контакты</div>
+      <div class="ph-sub">Все кандидаты с которыми было взаимодействие</div>
+    </div>
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" placeholder="Поиск по имени или навыку..." oninput="onSearch(this.value)" />
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="stats-row">
+    <div class="stat-card" style="animation-delay:0s">
+      <div class="sc-num">14</div>
+      <div class="sc-lbl">Всего контактов</div>
+      <div class="sc-delta up">↑ +3 за неделю</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.04s">
+      <div class="sc-num" style="color:var(--purple)">5</div>
+      <div class="sc-lbl">Приглашены</div>
+      <div class="sc-delta up">↑ +2 за неделю</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.08s">
+      <div class="sc-num" style="color:var(--blue)">3</div>
+      <div class="sc-lbl">Контакт запрошен</div>
+      <div class="sc-delta flat">— без изменений</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.12s">
+      <div class="sc-num" style="color:var(--warning)">2</div>
+      <div class="sc-lbl">Тестовое задание</div>
+      <div class="sc-delta up">↑ +1 за неделю</div>
+    </div>
+    <div class="stat-card" style="animation-delay:.16s">
+      <div class="sc-num" style="color:var(--text-muted)">4</div>
+      <div class="sc-lbl">Отклонены</div>
+      <div class="sc-delta flat">— без изменений</div>
+    </div>
+  </div>
+
+  <div class="filters-row">
+    <span class="filter-label">ВАКАНСИЯ:</span>
+    <div class="vac-dropdown-wrap" id="vac-wrap">
+      <button class="vac-dropdown-btn" id="vac-btn" onclick="toggleVacDropdown()">
+        <span id="vac-btn-label">Все вакансии</span>
+        <span class="vac-chevron">▼</span>
+      </button>
+      <div class="vac-dropdown-panel" id="vac-panel">
+        <div class="vac-search-wrap">
+          <input class="vac-search-input" id="vac-search" placeholder="Поиск вакансии..." oninput="filterVacOptions(this.value)" />
+        </div>
+        <div class="vac-list" id="vac-list"></div>
+      </div>
+    </div>
+    <div class="filter-sep"></div>
+    <select class="filter-select" onchange="setSort(this.value)">
+      <option value="date">По дате</option>
+      <option value="match">По совпадению</option>
+      <option value="name">По имени</option>
+    </select>
+    <span class="total-label" id="total-label">14 контактов</span>
+  </div>
+
+  <div class="kanban" id="kanban"></div>
+
+</div>
+
+<!-- Drawer -->
+<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="d-header">
+    <div class="d-ava" id="d-ava"></div>
+    <div style="flex:1;min-width:0">
+      <div class="d-name" id="d-name"></div>
+      <div class="d-role" id="d-role"></div>
+    </div>
+    <div style="text-align:right;flex-shrink:0">
+      <div class="d-pct" id="d-pct"></div>
+      <div class="d-pct-lbl">совпадение</div>
+    </div>
+    <button class="d-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="d-body">
+    <div class="d-section">
+      <div class="d-section-title">Основное</div>
+      <div class="d-row"><span class="d-key">Вакансия</span><span class="d-val" id="d-vacancy"></span></div>
+      <div class="d-row"><span class="d-key">Опыт</span><span class="d-val" id="d-exp"></span></div>
+      <div class="d-row"><span class="d-key">Зарплата</span><span class="d-val" id="d-salary"></span></div>
+      <div class="d-row"><span class="d-key">Формат</span><span class="d-val" id="d-format"></span></div>
+      <div class="d-row"><span class="d-key">Статус</span><span class="d-val" id="d-status"></span></div>
+      <div class="d-row"><span class="d-key">Дата действия</span><span class="d-val" id="d-date"></span></div>
+    </div>
+    <div class="d-section">
+      <div class="d-section-title">Навыки</div>
+      <div class="d-tags" id="d-skills"></div>
+    </div>
+    <div class="d-section">
+      <div class="d-section-title">Заметка</div>
+      <textarea class="note-area" id="d-note" placeholder="Добавьте заметку о кандидате..."></textarea>
+      <button class="btn-save-note" onclick="saveNote()">Сохранить заметку</button>
+    </div>
+  </div>
+  <div class="d-footer">
+    <button class="btn-d-main" id="d-btn-main">—</button>
+    <button class="btn-d-sec" onclick="location.href='yoffer-candidate.html'">Открыть карточку кандидата →</button>
+  </div>
+</div>
+
+<script>
+const contacts = [
+  { id:1,  name:'Дмитрий К.',  ini:'ДК', color:'#6B4EFF', role:'Senior Python Developer', exp:'5 лет', salary:'5 000 €', format:'Remote',       match:94, status:'invited',  vac:'python', vacName:'Python Backend Dev', date:'18 мар', skills:['Python','FastAPI','PostgreSQL','Redis','Docker'], note:'' },
+  { id:2,  name:'Анна В.',     ini:'АВ', color:'#10B981', role:'Backend Developer',        exp:'4 года', salary:'4 500 €', format:'Гибрид',       match:88, status:'invited',  vac:'python', vacName:'Python Backend Dev', date:'17 мар', skills:['Python','Django','Redis'], note:'' },
+  { id:3,  name:'Ирина М.',    ini:'ИМ', color:'#8B5CF6', role:'Product Manager',          exp:'6 лет', salary:'6 000 €', format:'Remote',        match:91, status:'invited',  vac:'pm',     vacName:'Product Manager',    date:'16 мар', skills:['Product Strategy','Roadmap','Jira','Agile'], note:'' },
+  { id:4,  name:'Сергей Б.',   ini:'СБ', color:'#F97316', role:'Product Manager',          exp:'4 года', salary:'5 200 €', format:'Офис',         match:79, status:'invited',  vac:'pm',     vacName:'Product Manager',    date:'15 мар', skills:['Product','Analytics','SQL'], note:'' },
+  { id:5,  name:'Кирилл Д.',   ini:'КД', color:'#EC4899', role:'UI/UX Designer',           exp:'3 года', salary:'3 800 €', format:'Remote',       match:85, status:'invited',  vac:'design', vacName:'UI/UX Designer',     date:'14 мар', skills:['Figma','Sketch','Prototyping'], note:'' },
+  { id:6,  name:'Артём Л.',    ini:'АЛ', color:'#06B6D4', role:'Python Backend Engineer',  exp:'6 лет', salary:'5 500 €', format:'Офис · Рига',  match:76, status:'contact',  vac:'python', vacName:'Python Backend Dev', date:'17 мар', skills:['Python','DRF','Kubernetes'], note:'' },
+  { id:7,  name:'Наталья Г.',  ini:'НГ', color:'#84CC16', role:'Product Manager',          exp:'5 лет', salary:'5 800 €', format:'Remote',        match:82, status:'contact',  vac:'pm',     vacName:'Product Manager',    date:'16 мар', skills:['Product','B2B','Stakeholders'], note:'' },
+  { id:8,  name:'Олег П.',     ini:'ОП', color:'#F59E0B', role:'UI/UX Designer',           exp:'4 года', salary:'4 200 €', format:'Гибрид',       match:77, status:'contact',  vac:'design', vacName:'UI/UX Designer',     date:'15 мар', skills:['Figma','Motion','Design Systems'], note:'' },
+  { id:9,  name:'Михаил Р.',   ini:'МР', color:'#EF4444', role:'Python Engineer',          exp:'3 года', salary:'3 800 €', format:'Remote',       match:82, status:'task',     vac:'python', vacName:'Python Backend Dev', date:'18 мар', skills:['Python','Flask','Docker'], note:'' },
+  { id:10, name:'Виктория С.', ini:'ВС', color:'#6366F1', role:'Product Manager',          exp:'3 года', salary:'4 500 €', format:'Remote',       match:74, status:'task',     vac:'pm',     vacName:'Product Manager',    date:'16 мар', skills:['Product','Analytics','Figma'], note:'' },
+  { id:11, name:'Павел Г.',    ini:'ПГ', color:'#9CA3AF', role:'Python Developer',         exp:'4 года', salary:'4 000 €', format:'Гибрид',       match:63, status:'declined', vac:'python', vacName:'Python Backend Dev', date:'15 мар', skills:['Python','Flask','MySQL'], note:'' },
+  { id:12, name:'Елена К.',    ini:'ЕК', color:'#9CA3AF', role:'Product Manager',          exp:'2 года', salary:'3 500 €', format:'Офис',         match:58, status:'declined', vac:'pm',     vacName:'Product Manager',    date:'14 мар', skills:['Product','Jira'], note:'' },
+  { id:13, name:'Роман Т.',    ini:'РТ', color:'#9CA3AF', role:'UI/UX Designer',           exp:'1 год',  salary:'2 500 €', format:'Remote',       match:51, status:'declined', vac:'design', vacName:'UI/UX Designer',     date:'13 мар', skills:['Figma','Canva'], note:'' },
+  { id:14, name:'Алина Ф.',    ini:'АФ', color:'#9CA3AF', role:'Python Developer',         exp:'2 года', salary:'3 200 €', format:'Remote',       match:55, status:'declined', vac:'python', vacName:'Python Backend Dev', date:'12 мар', skills:['Python','Django'], note:'' },
+];
+
+const COLS = [
+  { key:'invited',  label:'Приглашены к диалогу', cls:'col-invited' },
+  { key:'contact',  label:'Контакт запрошен',      cls:'col-contact' },
+  { key:'task',     label:'Тестовое задание',       cls:'col-task' },
+  { key:'declined', label:'Отклонены',              cls:'col-declined' },
+];
+
+let filterVac = 'all', sortMode = 'date', searchQ = '', openId = null;
+
+function filtered() {
+  return contacts.filter(c => {
+    const v = filterVac === 'all' || c.vac === filterVac;
+    const s = !searchQ || c.name.toLowerCase().includes(searchQ) || c.skills.some(x => x.toLowerCase().includes(searchQ));
+    return v && s;
+  });
+}
+
+function render() {
+  const data = [...filtered()].sort((a,b) =>
+    sortMode === 'match' ? b.match - a.match :
+    sortMode === 'name'  ? a.name.localeCompare(b.name) : 0
+  );
+  const total = data.length;
+  document.getElementById('total-label').textContent = total + ' контакт' + (total%10===1&&total%100!==11?'':([2,3,4].includes(total%10)&&![12,13,14].includes(total%100)?'а':'ов'));
+
+  document.getElementById('kanban').innerHTML = COLS.map(col => {
+    const cards = data.filter(c => c.status === col.key);
+    return `<div class="kanban-col ${col.cls}">
+      <div class="col-header">
+        <span class="col-header-title">${col.label}</span>
+        <span class="col-header-count">${cards.length}</span>
+      </div>
+      ${cards.length ? cards.map((c,i) => cardHtml(c,i)).join('') : '<div class="empty-col">Нет контактов<br>в этой колонке</div>'}
+    </div>`;
+  }).join('');
+}
+
+function cardHtml(c, i) {
+  const pc = c.match>=80?'h':c.match>=65?'m':'l';
+  const skills = c.skills.slice(0,2).map(s=>`<span class="cc-skill">${s}</span>`).join('') + (c.skills.length>2?`<span class="cc-skill" style="color:var(--text-muted)">+${c.skills.length-2}</span>`:'');
+  return `<div class="contact-card${c.status==='declined'?' is-declined':''}" style="animation-delay:${i*.04}s" onclick="openDrawer(${c.id})">
+    <div class="cc-top">
+      <div class="cc-ava" style="background:${c.color}">${c.ini}</div>
+      <div class="cc-info"><div class="cc-name">${c.name}</div><div class="cc-role">${c.role}</div></div>
+      <div class="cc-pct ${pc}">${c.match}%</div>
+    </div>
+    <div class="cc-vacancy-tag">${c.vacName}</div>
+    <div class="cc-footer"><div class="cc-skills">${skills}</div><span class="cc-date">${c.date}</span></div>
+  </div>`;
+}
+
+// ── VACANCY DROPDOWN ──
+const vacancyOptions = [
+  { key: 'all',     label: 'Все вакансии',       count: null },
+  { key: 'python',  label: 'Python Backend Dev',  count: 8 },
+  { key: 'pm',      label: 'Product Manager',     count: 4 },
+  { key: 'design',  label: 'UI/UX Designer',      count: 3 },
+  { key: 'devops',  label: 'DevOps Engineer',     count: 2 },
+  { key: 'ios',     label: 'iOS Developer',       count: 5 },
+  { key: 'android', label: 'Android Developer',   count: 3 },
+  { key: 'data',    label: 'Data Engineer',       count: 6 },
+  { key: 'ml',      label: 'ML Engineer',         count: 2 },
+  { key: 'qa',      label: 'QA Engineer',         count: 4 },
+];
+
+let vacSearch = '';
+
+function renderVacOptions(query) {
+  const list = document.getElementById('vac-list');
+  const q = (query || '').toLowerCase();
+  const filtered = vacancyOptions.filter(o => !q || o.label.toLowerCase().includes(q));
+  if (!filtered.length) {
+    list.innerHTML = '<div class="vac-empty">Ничего не найдено</div>';
+    return;
+  }
+  list.innerHTML = filtered.map(o => {
+    const sel = filterVac === o.key ? 'selected' : '';
+    const cnt = o.count !== null ? `<span class="vac-option-count">${o.count}</span>` : '';
+    return `<div class="vac-option ${sel}" onclick="selectVacancy('${o.key}', '${o.label}')">
+      <span>${o.label}</span>${cnt}
+    </div>`;
+  }).join('');
+}
+
+function toggleVacDropdown() {
+  const panel = document.getElementById('vac-panel');
+  const btn = document.getElementById('vac-btn');
+  const isOpen = panel.classList.contains('show');
+  if (isOpen) { closeVacDropdown(); return; }
+  panel.classList.add('show');
+  btn.classList.add('open');
+  renderVacOptions('');
+  setTimeout(() => document.getElementById('vac-search').focus(), 50);
+}
+
+function closeVacDropdown() {
+  document.getElementById('vac-panel').classList.remove('show');
+  document.getElementById('vac-btn').classList.remove('open');
+  document.getElementById('vac-search').value = '';
+}
+
+function filterVacOptions(q) {
+  renderVacOptions(q);
+}
+
+function selectVacancy(key, label) {
+  filterVac = key;
+  const btn = document.getElementById('vac-btn');
+  document.getElementById('vac-btn-label').textContent = key === 'all' ? 'Все вакансии' : label;
+  btn.classList.toggle('has-value', key !== 'all');
+  closeVacDropdown();
+  render();
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if (!document.getElementById('vac-wrap')?.contains(e.target)) closeVacDropdown();
+});
+
+function setVacancy(v, btn) {
+  filterVac = v;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+function setSort(v) { sortMode = v; render(); }
+function onSearch(v) { searchQ = v.toLowerCase().trim(); render(); }
+
+function openDrawer(id) {
+  const c = contacts.find(x => x.id === id);
+  if (!c) return;
+  openId = id;
+
+  document.getElementById('d-ava').textContent = c.ini;
+  document.getElementById('d-ava').style.background = c.color;
+  document.getElementById('d-name').textContent = c.name;
+  document.getElementById('d-role').textContent = c.role;
+  document.getElementById('d-pct').textContent = c.match + '%';
+  document.getElementById('d-pct').style.color = c.match>=80?'var(--success)':c.match>=65?'var(--warning)':'var(--error)';
+  document.getElementById('d-vacancy').textContent = c.vacName;
+  document.getElementById('d-exp').textContent = c.exp;
+  document.getElementById('d-salary').textContent = c.salary;
+  document.getElementById('d-format').textContent = c.format;
+  document.getElementById('d-date').textContent = c.date;
+  document.getElementById('d-note').value = c.note;
+
+  const statusMap = { invited:'Приглашён к диалогу', contact:'Контакт запрошен', task:'Тестовое задание отправлено', declined:'Отклонён' };
+  const colorMap  = { invited:'var(--purple)', contact:'var(--blue)', task:'var(--warning)', declined:'var(--error)' };
+  const dStatus = document.getElementById('d-status');
+  dStatus.textContent = statusMap[c.status];
+  dStatus.style.color = colorMap[c.status];
+
+  document.getElementById('d-skills').innerHTML = c.skills.map(s => `<span class="d-tag">${s}</span>`).join('');
+
+  const btn = document.getElementById('d-btn-main');
+  btn.disabled = false;
+  btn.style.background = '';
+  if (c.status === 'invited')  { btn.textContent = '✓ Уже приглашён';            btn.style.background = 'var(--success)'; btn.disabled = true; }
+  if (c.status === 'contact')  { btn.textContent = '✓ Контакт запрошен';         btn.style.background = 'var(--blue)';    btn.disabled = true; }
+  if (c.status === 'task')     { btn.textContent = '✓ Тестовое отправлено';      btn.style.background = 'var(--warning)'; btn.disabled = true; }
+  if (c.status === 'declined') { btn.textContent = '✕ Отклонён';                 btn.style.background = 'var(--bg)'; btn.style.color = 'var(--text-muted)'; btn.disabled = true; }
+
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawer-overlay').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawer-overlay').classList.remove('show');
+  document.body.style.overflow = '';
+  openId = null;
+}
+
+function saveNote() {
+  if (!openId) return;
+  const c = contacts.find(x => x.id === openId);
+  if (c) c.note = document.getElementById('d-note').value;
+  const btn = document.querySelector('.btn-save-note');
+  btn.textContent = 'Сохранено ✓';
+  setTimeout(() => btn.textContent = 'Сохранить заметку', 2000);
+}
+
+render();
+</script>
+</body>
+</html>

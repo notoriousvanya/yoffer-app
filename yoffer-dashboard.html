@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Личный кабинет</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+    --error: #EF4444;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-links { display: flex; align-items: center; gap: 4px; }
+  .nav-link {
+    padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    color: var(--text-secondary); text-decoration: none; transition: all .18s; cursor: pointer; border: none; background: none; font-family: 'Manrope', sans-serif;
+  }
+  .nav-link:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-link.active { color: var(--purple); background: var(--purple-soft); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: var(--purple); display: flex; align-items: center;
+    justify-content: center; font-size: 13px; font-weight: 800; color: #fff; cursor: pointer;
+  }
+  .nav-name { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+
+  /* ── LAYOUT ── */
+  .page { flex: 1; padding: 40px 48px 120px; max-width: 1200px; margin: 0 auto; width: 100%; }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center;
+    min-height: calc(100vh - 200px); padding: 40px;
+  }
+  .empty-visual {
+    width: 120px; height: 120px; border-radius: 32px;
+    background: var(--purple-soft); display: flex;
+    align-items: center; justify-content: center;
+    font-size: 52px; margin-bottom: 28px;
+    animation: gentle-pulse 3s ease-in-out infinite;
+  }
+  @keyframes gentle-pulse {
+    0%,100%{transform:scale(1)} 50%{transform:scale(1.04)}
+  }
+  .empty-state h2 { font-size: 28px; font-weight: 800; letter-spacing: -.7px; margin-bottom: 10px; }
+  .empty-state p { font-size: 16px; color: var(--text-secondary); font-weight: 500; max-width: 380px; line-height: 1.65; margin-bottom: 32px; }
+  .btn-start {
+    padding: 15px 40px; border-radius: 14px; font-size: 15px; font-weight: 700;
+    font-family: 'Manrope', sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 6px 24px rgba(107,78,255,.32);
+  }
+  .btn-start:hover { background: var(--purple-light); transform: translateY(-2px); box-shadow: 0 10px 32px rgba(107,78,255,.4); }
+
+  /* ── DASHBOARD HEADER ── */
+  .dash-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 32px; gap: 16px; flex-wrap: wrap; }
+  .dash-title { font-size: 26px; font-weight: 800; letter-spacing: -.7px; }
+  .dash-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-top: 4px; }
+
+  /* ── STATS ROW ── */
+  .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
+  .stat-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 20px 22px;
+  }
+  .stat-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; letter-spacing: .03em; }
+  .stat-value { font-size: 28px; font-weight: 800; letter-spacing: -1px; color: var(--text-primary); }
+  .stat-value.purple { color: var(--purple); }
+  .stat-value.green { color: var(--success); }
+  .stat-change { font-size: 12px; font-weight: 600; color: var(--success); margin-top: 4px; }
+
+  /* ── FILTERS ── */
+  .filters { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 7px 16px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope', sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .filter-btn:hover { border-color: var(--purple-mid); color: var(--text-primary); }
+  .filter-btn.active { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .filter-search {
+    margin-left: auto; padding: 8px 16px 8px 36px; border-radius: 10px;
+    border: 1.5px solid var(--border); font-size: 13px; font-weight: 500;
+    font-family: 'Manrope', sans-serif; color: var(--text-primary);
+    background: var(--white); outline: none; transition: border-color .2s; width: 220px;
+  }
+  .filter-search:focus { border-color: var(--purple); }
+  .search-wrap { position: relative; }
+  .search-wrap::before { content: '🔍'; position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 13px; }
+
+  /* ── VACANCY CARDS ── */
+  .vacancy-grid { display: grid; gap: 14px; }
+  .vacancy-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 18px; padding: 22px 24px;
+    display: grid; grid-template-columns: 1fr auto;
+    align-items: center; gap: 16px;
+    transition: all .2s; cursor: pointer;
+    animation: fadeUp .4s ease both;
+  }
+  .vacancy-card:hover { border-color: var(--purple-mid); box-shadow: 0 4px 20px rgba(107,78,255,.08); transform: translateY(-1px); }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .vc-left { display: flex; align-items: center; gap: 16px; }
+  .vc-icon {
+    width: 48px; height: 48px; border-radius: 14px;
+    background: var(--purple-soft); display: flex;
+    align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0;
+  }
+  .vc-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.2px; }
+  .vc-meta { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .vc-tag {
+    font-size: 12px; font-weight: 600; padding: 3px 10px;
+    border-radius: 100px; background: var(--bg); color: var(--text-secondary);
+  }
+  .vc-date { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+  .vc-right { display: flex; align-items: center; gap: 12px; }
+  .vc-matches {
+    text-align: center;
+  }
+  .vc-matches-num { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -1px; }
+  .vc-matches-lbl { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+
+  /* Status badge */
+  .status-badge {
+    font-size: 12px; font-weight: 700; padding: 5px 12px;
+    border-radius: 100px; white-space: nowrap;
+  }
+  .status-active { background: var(--success-bg); color: var(--success); }
+  .status-draft { background: var(--bg); color: var(--text-muted); }
+  .status-closed { background: #FEF2F2; color: var(--error); }
+
+  /* Card actions */
+  .vc-actions { display: flex; align-items: center; gap: 6px; }
+  .vc-btn {
+    padding: 7px 14px; border-radius: 9px; font-size: 12px; font-weight: 700;
+    font-family: 'Manrope', sans-serif; cursor: pointer; transition: all .18s; border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary);
+  }
+  .vc-btn:hover { border-color: var(--purple); color: var(--purple); }
+  .vc-btn.primary { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .vc-btn.primary:hover { background: var(--purple-light); }
+  .vc-dots { width: 32px; height: 32px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--text-muted); transition: all .18s; }
+  .vc-dots:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* Share modal */
+  .share-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,26,46,.5); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .share-modal.show { opacity: 1; pointer-events: all; }
+  .share-box {
+    background: var(--white); border-radius: 20px; padding: 36px 32px;
+    width: 100%; max-width: 460px;
+    box-shadow: 0 24px 64px rgba(26,26,46,.15);
+    transform: translateY(12px) scale(.97);
+    transition: transform .25s ease;
+  }
+  .share-modal.show .share-box { transform: translateY(0) scale(1); }
+  .share-box h3 { font-size: 18px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.4px; }
+  .share-box p { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-bottom: 24px; line-height: 1.6; }
+  .share-option { border: 1.5px solid var(--border); border-radius: 14px; padding: 16px 18px; margin-bottom: 12px; }
+  .share-option-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .share-option-title { font-size: 14px; font-weight: 700; }
+  .share-option-desc { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 12px; line-height: 1.5; }
+  .share-link-row { display: flex; gap: 8px; }
+  .share-link-input {
+    flex: 1; padding: 9px 13px; border-radius: 9px;
+    border: 1.5px solid var(--border); font-size: 12px;
+    font-family: 'Manrope', sans-serif; color: var(--text-muted);
+    background: var(--bg); outline: none;
+  }
+  .btn-copy {
+    padding: 9px 16px; border-radius: 9px; font-size: 12px; font-weight: 700;
+    font-family: 'Manrope', sans-serif; background: var(--purple); color: #fff;
+    border: none; cursor: pointer; transition: all .2s; white-space: nowrap;
+  }
+  .btn-copy:hover { background: var(--purple-light); }
+  .btn-copy.copied { background: var(--success); }
+  .share-close { width: 100%; padding: 12px; border-radius: 12px; margin-top: 16px; font-size: 14px; font-weight: 600; font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .share-close:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* ── STICKY BOTTOM BTN ── */
+  .sticky-btn {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 40;
+    padding: 16px 48px 24px;
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+  }
+  .btn-create-full {
+    width: 100%; max-width: 1104px; margin: 0 auto; display: block;
+    padding: 15px; border-radius: 14px; font-size: 15px; font-weight: 700;
+    font-family: 'Manrope', sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 6px 24px rgba(107,78,255,.28);
+  }
+  .btn-create-full:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  /* ── DROPDOWN MENU ── */
+  .dropdown { position: relative; }
+  #floating-menu {
+    display: none;
+    position: fixed; z-index: 99999;
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 6px; min-width: 190px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+  }
+  #floating-menu.show { display: block; }
+  .dd-item {
+    display: flex; align-items: center; gap: 8px; padding: 9px 12px;
+    border-radius: 9px; font-size: 13px; font-weight: 600;
+    color: var(--text-secondary); cursor: pointer; transition: all .15s;
+  }
+  .dd-item:hover { background: var(--bg); color: var(--text-primary); }
+  .dd-item.danger { color: var(--error); }
+  .dd-item.danger:hover { background: #FEF2F2; }
+  .dd-sep { height: 1px; background: var(--border); margin: 4px 0; }
+
+  @media(max-width:900px){
+    nav{padding:0 20px} .page{padding:24px 20px 100px}
+    .stats-row{grid-template-columns:1fr 1fr}
+    .vc-right{flex-direction:column;align-items:flex-end;gap:8px}
+    .sticky-btn{padding:12px 20px 20px}
+  }
+  @media(max-width:600px){
+    .stats-row{grid-template-columns:1fr}
+    .vc-left{flex-direction:column;align-items:flex-start;gap:10px}
+    .vacancy-card{grid-template-columns:1fr}
+  }
+
+  /* Note modal styles */
+  .note-modal-text {
+    font-size: 14px; color: var(--text-secondary); font-weight: 500;
+    line-height: 1.75; background: var(--bg); border-radius: 12px;
+    padding: 14px 16px; max-height: 280px; overflow-y: auto;
+    white-space: pre-wrap; word-break: break-word;
+    border: 1.5px solid var(--border); margin-bottom: 16px;
+    font-family: 'Manrope', sans-serif;
+  }
+  .note-modal-edit {
+    width: 100%; padding: 12px 14px; border-radius: 11px;
+    border: 1.5px solid var(--border); font-size: 14px;
+    font-family: 'Manrope',sans-serif; font-weight: 500;
+    color: var(--text-primary); outline: none; resize: vertical;
+    min-height: 140px; line-height: 1.65; margin-bottom: 14px;
+    background: var(--white); transition: border-color .2s;
+  }
+  .note-modal-edit:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(107,78,255,.08); }
+  .note-modal-actions { display: flex; gap: 8px; }
+  .btn-note-edit {
+    flex: 1; padding: 11px; border-radius: 11px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff;
+    border: none; cursor: pointer; transition: all .2s;
+  }
+  .btn-note-edit:hover { background: var(--purple-light); }
+  .btn-note-close {
+    padding: 11px 18px; border-radius: 11px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s;
+  }
+  .btn-note-close:hover { border-color: var(--purple); color: var(--purple); }
+  .vc-note-badge {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; color: var(--warning);
+    padding: 3px 10px; border-radius: 100px;
+    background: var(--warning-bg); border: 1.5px solid #FDE68A;
+    cursor: pointer; transition: all .18s; max-width: 320px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .vc-note-badge:hover { border-color: var(--warning); background: #FEF3C7; }
+
+
+  /* Modal overlay */
+  .modal-overlay {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(26,26,46,.5); backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .2s;
+  }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box {
+    background: var(--white); border-radius: 20px; padding: 32px;
+    width: 100%; max-width: 460px;
+    box-shadow: 0 24px 64px rgba(26,26,46,.15);
+    transform: translateY(12px) scale(.97); transition: transform .25s ease;
+  }
+  .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.4px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; line-height: 1.6; }
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-landing.html" class="nav-logo">YOFFER</a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showTab('vacancies')">Вакансии</button>
+    <button class="nav-link" onclick="window.location.href='yoffer-contacts.html'">Контакты</button>
+    <button class="nav-link" onclick="window.location.href='yoffer-settings.html'">Настройки</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar" title="Профиль">АИ</div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page" id="page-vacancies">
+
+  <!-- TOGGLE: empty / filled (demo) -->
+  <div style="display:flex;gap:8px;margin-bottom:28px;align-items:center">
+    <span style="font-size:13px;color:var(--text-muted);font-weight:500">Демо:</span>
+    <button class="filter-btn" id="btn-show-empty" onclick="showEmpty()">Первый вход</button>
+    <button class="filter-btn active" id="btn-show-filled" onclick="showFilled()">Есть вакансии</button>
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div id="empty-state" class="empty-state" style="display:none">
+    <div class="empty-visual">🔍</div>
+    <h2>Начните первый поиск</h2>
+    <p>Создайте профиль кандидата — ИИ поможет сформулировать требования и подберёт лучших из базы</p>
+    <button class="btn-start" onclick="goToCreate()">Создать первую вакансию →</button>
+  </div>
+
+  <!-- FILLED STATE -->
+  <div id="filled-state" style="display:none">
+
+    <div class="dash-header">
+      <div>
+        <h1 class="dash-title">Мои вакансии</h1>
+        <p class="dash-sub">Добрый день, Алексей — у вас 3 активных поиска</p>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">ВСЕГО ВАКАНСИЙ</div>
+        <div class="stat-value purple">5</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">АКТИВНЫХ</div>
+        <div class="stat-value green">3</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">СОВПАДЕНИЙ</div>
+        <div class="stat-value">47</div>
+        <div class="stat-change">↑ 12 за неделю</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">В КОНТАКТАХ</div>
+        <div class="stat-value">8</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterVacancies('all', this)">Все</button>
+      <button class="filter-btn" onclick="filterVacancies('active', this)">Активные</button>
+      <button class="filter-btn" onclick="filterVacancies('draft', this)">Черновики</button>
+      <button class="filter-btn" onclick="filterVacancies('closed', this)">Закрытые</button>
+      <div class="search-wrap">
+        <input class="filter-search" placeholder="Поиск по вакансиям..." oninput="searchVacancies(this.value)" />
+      </div>
+    </div>
+
+    <!-- Vacancy list -->
+    <div class="vacancy-grid" id="vacancy-list">
+
+      <div class="vacancy-card" data-status="active" data-title="Python Backend Developer" onclick="openVacancy(event, this)">
+        <div class="vc-left">
+          <div class="vc-icon">⚙️</div>
+          <div>
+            <div class="vc-title">Python Backend Developer</div>
+            <div class="vc-meta">
+              <span class="status-badge status-active">Активна</span>
+              <span class="vc-tag">Remote</span>
+              <span class="vc-tag">4 000–5 500 €</span>
+              <span class="vc-date">Создана 14 марта 2026</span>
+            </div>
+            <div id="vc-note-badge-1" style="margin-top:8px;display:none">
+              <span class="vc-note-badge has-note" onclick="event.stopPropagation(); openNoteModal('Python Backend Developer')" id="vc-note-text-1">📝 </span>
+            </div>
+          </div>
+        </div>
+        <div class="vc-right">
+          <div class="vc-matches">
+            <div class="vc-matches-num">18</div>
+            <div class="vc-matches-lbl">совпадений</div>
+          </div>
+          <div class="vc-actions">
+            <button class="vc-btn primary" onclick="event.stopPropagation(); window.location.href='yoffer-vacancy.html'">Открыть</button>
+            <button class="vc-btn" onclick="event.stopPropagation(); openShare('Python Backend Developer')">Поделиться</button>
+            <div class="dropdown">
+              <div class="vc-dots" onclick="event.stopPropagation(); toggleDropdown(this, this.closest('.vacancy-card').dataset.status)">···</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacancy-card" data-status="active" data-title="Product Manager" onclick="openVacancy(event, this)">
+        <div class="vc-left">
+          <div class="vc-icon">📊</div>
+          <div>
+            <div class="vc-title">Product Manager</div>
+            <div class="vc-meta">
+              <span class="status-badge status-active">Активна</span>
+              <span class="vc-tag">Гибрид · Рига</span>
+              <span class="vc-tag">3 500–4 500 €</span>
+              <span class="vc-date">Создана 10 марта 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="vc-right">
+          <div class="vc-matches">
+            <div class="vc-matches-num">12</div>
+            <div class="vc-matches-lbl">совпадений</div>
+          </div>
+          <div class="vc-actions">
+            <button class="vc-btn primary" onclick="event.stopPropagation(); window.location.href='yoffer-vacancy.html'">Открыть</button>
+            <button class="vc-btn" onclick="event.stopPropagation(); openShare('Product Manager')">Поделиться</button>
+            <div class="dropdown">
+              <div class="vc-dots" onclick="event.stopPropagation(); toggleDropdown(this, this.closest('.vacancy-card').dataset.status)">···</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacancy-card" data-status="active" data-title="UI/UX Designer" onclick="openVacancy(event, this)">
+        <div class="vc-left">
+          <div class="vc-icon">🎨</div>
+          <div>
+            <div class="vc-title">UI/UX Designer</div>
+            <div class="vc-meta">
+              <span class="status-badge status-active">Активна</span>
+              <span class="vc-tag">Remote</span>
+              <span class="vc-tag">2 500–3 500 €</span>
+              <span class="vc-date">Создана 5 марта 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="vc-right">
+          <div class="vc-matches">
+            <div class="vc-matches-num">17</div>
+            <div class="vc-matches-lbl">совпадений</div>
+          </div>
+          <div class="vc-actions">
+            <button class="vc-btn primary" onclick="event.stopPropagation(); window.location.href='yoffer-vacancy.html'">Открыть</button>
+            <button class="vc-btn" onclick="event.stopPropagation(); openShare('UI/UX Designer')">Поделиться</button>
+            <div class="dropdown">
+              <div class="vc-dots" onclick="event.stopPropagation(); toggleDropdown(this, this.closest('.vacancy-card').dataset.status)">···</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacancy-card" data-status="draft" data-title="DevOps Engineer" onclick="openVacancy(event, this)">
+        <div class="vc-left">
+          <div class="vc-icon">🔧</div>
+          <div>
+            <div class="vc-title">DevOps Engineer</div>
+            <div class="vc-meta">
+              <span class="status-badge status-draft">Черновик</span>
+              <span class="vc-tag">Remote</span>
+              <span class="vc-date">Изменён 2 марта 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="vc-right">
+          <div class="vc-matches">
+            <div class="vc-matches-num" style="color:var(--text-muted)">—</div>
+            <div class="vc-matches-lbl">не запущена</div>
+          </div>
+          <div class="vc-actions">
+            <button class="vc-btn primary" onclick="event.stopPropagation(); window.location.href='yoffer-briefing.html'">Продолжить</button>
+            <div class="dropdown">
+              <div class="vc-dots" onclick="event.stopPropagation(); toggleDropdown(this, this.closest('.vacancy-card').dataset.status)">···</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vacancy-card" data-status="closed" data-title="Frontend Developer" onclick="openVacancy(event, this)" style="opacity:.6">
+        <div class="vc-left">
+          <div class="vc-icon">💻</div>
+          <div>
+            <div class="vc-title">Frontend Developer</div>
+            <div class="vc-meta">
+              <span class="status-badge status-closed">Закрыта</span>
+              <span class="vc-tag">Офис · Рига</span>
+              <span class="vc-date">Закрыта 20 февраля 2026</span>
+            </div>
+          </div>
+        </div>
+        <div class="vc-right">
+          <div class="vc-matches">
+            <div class="vc-matches-num" style="color:var(--text-muted)">24</div>
+            <div class="vc-matches-lbl">было найдено</div>
+          </div>
+          <div class="vc-actions">
+            <button class="vc-btn" onclick="event.stopPropagation()">Архив</button>
+            <div class="dropdown">
+              <div class="vc-dots" onclick="event.stopPropagation(); toggleDropdown(this, this.closest('.vacancy-card').dataset.status)">···</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- STICKY CREATE BTN -->
+<div class="sticky-btn" id="sticky-btn" style="display:none">
+  <button class="btn-create-full" onclick="goToCreate()">+ Создать новую вакансию</button>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="share-modal" id="share-modal" onclick="closeShare(event)">
+  <div class="share-box">
+    <h3>Поделиться профилем</h3>
+    <p>Отправьте ссылку коллеге — он сможет посмотреть кандидатов или отредактировать профиль</p>
+
+    <div class="share-option">
+      <div class="share-option-header">
+        <div class="share-option-title">✎ С правом редактирования</div>
+        <span style="font-size:11px;background:var(--warning-bg);color:var(--warning);font-weight:700;padding:3px 8px;border-radius:100px">Защита паролем</span>
+      </div>
+      <div class="share-option-desc">Получатель откроет ссылку и введёт пароль — без регистрации. Сможет редактировать профиль и смотреть совпадения.</div>
+      <div class="share-link-row">
+        <input class="share-link-input" value="https://yoffer.app/profile/py-backend-x7k2/edit" readonly id="link-edit" />
+        <button class="btn-copy" onclick="copyLink('link-edit', this)">Копировать</button>
+      </div>
+      <div style="margin-top:10px;display:flex;align-items:center;gap:8px">
+        <input id="share-password" type="text" placeholder="Придумайте пароль для ссылки" style="flex:1;padding:8px 12px;border-radius:9px;border:1.5px solid var(--border);font-size:13px;font-family:Manrope,sans-serif;outline:none;background:var(--white);color:var(--text-primary)" />
+        <button onclick="savePassword()" style="padding:8px 14px;border-radius:9px;font-size:12px;font-weight:700;font-family:Manrope,sans-serif;background:var(--bg);border:1.5px solid var(--border);color:var(--text-secondary);cursor:pointer" id="btn-save-pw">Сохранить</button>
+      </div>
+    </div>
+
+    <div class="share-option">
+      <div class="share-option-header">
+        <div class="share-option-title">👁 Только просмотр</div>
+        <span style="font-size:11px;background:var(--success-bg);color:var(--success);font-weight:700;padding:3px 8px;border-radius:100px">Без пароля</span>
+      </div>
+      <div class="share-option-desc">Получатель увидит профиль и список кандидатов, но не сможет ничего менять. Ни пароля, ни входа.</div>
+      <div class="share-link-row">
+        <input class="share-link-input" value="https://yoffer.app/profile/py-backend-x7k2/view" readonly id="link-view" />
+        <button class="btn-copy" onclick="copyLink('link-view', this)">Копировать</button>
+      </div>
+    </div>
+
+    <button class="share-close" onclick="closeShareDirect()">Закрыть</button>
+  </div>
+</div>
+
+<script>
+// Demo toggle
+function showEmpty() {
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('filled-state').style.display = 'none';
+  document.getElementById('sticky-btn').style.display = 'none';
+  document.getElementById('btn-show-empty').classList.add('active');
+  document.getElementById('btn-show-filled').classList.remove('active');
+}
+function showFilled() {
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('filled-state').style.display = 'block';
+  document.getElementById('sticky-btn').style.display = 'block';
+  document.getElementById('btn-show-filled').classList.add('active');
+  document.getElementById('btn-show-empty').classList.remove('active');
+}
+
+// Nav tabs
+function showTab(tab) {
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// Filters
+function filterVacancies(status, btn) {
+  document.querySelectorAll('.filters .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.vacancy-card').forEach(card => {
+    if (status === 'all' || card.dataset.status === status) {
+      card.style.display = 'grid';
+    } else {
+      card.style.display = 'none';
+    }
+  });
+}
+
+function searchVacancies(val) {
+  const q = val.toLowerCase();
+  document.querySelectorAll('.vacancy-card').forEach(card => {
+    const title = card.dataset.title.toLowerCase();
+    card.style.display = title.includes(q) ? 'grid' : 'none';
+  });
+}
+
+// Open vacancy
+// ── NOTE MODAL ──
+let noteEditing = false;
+
+function openNoteModal(vacancyTitle) {
+  const note = localStorage.getItem('yoffer_vacancy_note') || '';
+  noteEditing = false;
+  document.getElementById('note-modal-title').textContent = 'Заметка — ' + vacancyTitle;
+  document.getElementById('note-modal-text').textContent = note || 'Заметка не добавлена.';
+  document.getElementById('note-modal-text').style.display = 'block';
+  document.getElementById('note-modal-edit').style.display = 'none';
+  document.getElementById('note-modal-edit').value = note;
+  document.getElementById('btn-note-action').textContent = '✎ Редактировать';
+  document.getElementById('note-modal').classList.add('show');
+}
+
+function closeNoteModal() {
+  document.getElementById('note-modal').classList.remove('show');
+  noteEditing = false;
+}
+
+function toggleNoteEdit() {
+  noteEditing = !noteEditing;
+  const text = document.getElementById('note-modal-text');
+  const edit = document.getElementById('note-modal-edit');
+  const btn = document.getElementById('btn-note-action');
+  if (noteEditing) {
+    text.style.display = 'none';
+    edit.style.display = 'block';
+    edit.focus();
+    btn.textContent = '✓ Сохранить';
+  } else {
+    const val = edit.value.trim();
+    localStorage.setItem('yoffer_vacancy_note', val);
+    text.textContent = val || 'Заметка не добавлена.';
+    text.style.display = 'block';
+    edit.style.display = 'none';
+    btn.textContent = '✎ Редактировать';
+    updateNoteBadge(val);
+  }
+}
+
+function updateNoteBadge(note) {
+  const badge = document.getElementById('vc-note-badge-1');
+  const text = document.getElementById('vc-note-text-1');
+  if (note && note.trim()) {
+    badge.style.display = 'block';
+    const preview = note.length > 60 ? note.substring(0, 60) + '...' : note;
+    text.textContent = '📝 ' + preview;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+// Load note badge on init
+document.addEventListener('DOMContentLoaded', () => {
+  const note = localStorage.getItem('yoffer_vacancy_note') || '';
+  updateNoteBadge(note);
+  showFilled(); // default view
+});
+
+function openVacancy(e, card) {
+  if (e.target.closest('.dropdown') || e.target.tagName === 'BUTTON') return;
+  window.location.href = 'yoffer-vacancy.html';
+}
+
+// Navigate to create
+function goToCreate() {
+  window.location.href = 'yoffer-briefing.html';
+}
+
+// Dropdown
+const menus = {
+  active: [
+    { label: '✎ Редактировать', action: '' },
+    { label: '📋 Дублировать', action: '' },
+    { sep: true },
+    { label: '✕ Закрыть вакансию', action: '', danger: true }
+  ],
+  draft: [
+    { label: '✎ Редактировать', action: '' },
+    { label: '📋 Дублировать', action: '' },
+    { sep: true },
+    { label: '✕ Удалить черновик', action: '', danger: true }
+  ],
+  closed: [
+    { label: '♻ Переоткрыть', action: '' },
+    { label: '📋 Дублировать', action: '' },
+    { sep: true },
+    { label: '✕ Удалить', action: '', danger: true }
+  ]
+};
+
+function toggleDropdown(el, status) {
+  const fm = document.getElementById('floating-menu');
+  const isOpen = fm.classList.contains('show') && fm._anchor === el;
+
+  fm.classList.remove('show');
+  fm._anchor = null;
+
+  if (!isOpen) {
+    const items = menus[status] || menus.active;
+    const html = items.map(item => {
+      if (item.sep) return '<div class="dd-sep"></div>';
+      return `<div class="dd-item${item.danger ? ' danger' : ''}" onclick="document.getElementById('floating-menu').classList.remove('show')">${item.label}</div>`;
+    }).join('');
+    document.getElementById('fm-items').innerHTML = html;
+
+    const rect = el.getBoundingClientRect();
+    fm.style.top = (rect.bottom + 6) + 'px';
+    fm.style.left = 'auto';
+    fm.style.right = (window.innerWidth - rect.right) + 'px';
+    fm._anchor = el;
+    fm.classList.add('show');
+  }
+}
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.vc-dots') && !e.target.closest('#floating-menu')) {
+    document.getElementById('floating-menu').classList.remove('show');
+  }
+});
+
+window.addEventListener('scroll', () => {
+  document.getElementById('floating-menu').classList.remove('show');
+});
+
+// Share modal
+function openShare(title) {
+  document.getElementById('share-modal').classList.add('show');
+}
+function closeShare(e) {
+  if (e.target === document.getElementById('share-modal')) {
+    document.getElementById('share-modal').classList.remove('show');
+  }
+}
+function closeShareDirect() {
+  document.getElementById('share-modal').classList.remove('show');
+}
+function savePassword() {
+  const pw = document.getElementById('share-password').value.trim();
+  if (!pw) return;
+  const btn = document.getElementById('btn-save-pw');
+  btn.textContent = 'Сохранено ✓';
+  btn.style.background = 'var(--success-bg)';
+  btn.style.color = 'var(--success)';
+  btn.style.borderColor = 'var(--success)';
+  setTimeout(() => {
+    btn.textContent = 'Сохранить';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.borderColor = '';
+  }, 2000);
+}
+function copyLink(id, btn) {
+  const val = document.getElementById(id).value;
+  navigator.clipboard.writeText(val).catch(() => {});
+  btn.textContent = 'Скопировано ✓';
+  btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 2000);
+}
+</script>
+<!-- FLOATING DROPDOWN MENU -->
+<div id="floating-menu"><div id="fm-items"></div></div>
+
+
+<!-- NOTE MODAL -->
+<div class="modal-overlay" id="note-modal" onclick="if(event.target===this)closeNoteModal()">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-title" id="note-modal-title">Заметка — Python Backend Developer</div>
+    <div class="modal-sub" style="margin-bottom:14px">Внутренняя заметка видна только вашей команде</div>
+    <div class="note-modal-text" id="note-modal-text"></div>
+    <textarea class="note-modal-edit" id="note-modal-edit" placeholder="Введите заметку..."></textarea>
+    <div class="note-modal-actions">
+      <button class="btn-note-edit" id="btn-note-action" onclick="toggleNoteEdit()">✎ Редактировать</button>
+      <button class="btn-note-close" onclick="closeNoteModal()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

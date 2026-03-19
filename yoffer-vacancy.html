@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Вакансия</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+    --error: #EF4444;
+    --error-bg: #FEF2F2;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-links { display: flex; gap: 4px; }
+  .nav-link { padding: 8px 16px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text-secondary); text-decoration: none; transition: all .18s; cursor: pointer; border: none; background: none; font-family: 'Manrope',sans-serif; }
+  .nav-link:hover { color: var(--text-primary); background: var(--bg); }
+  .nav-link.active { color: var(--purple); background: var(--purple-soft); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+
+  /* VACANCY HEADER */
+  .vacancy-header {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 20px 48px; position: sticky; top: 64px; z-index: 40;
+  }
+  .vh-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .vh-left { display: flex; align-items: center; gap: 14px; }
+  .vh-back { width: 36px; height: 36px; border-radius: 10px; border: 1.5px solid var(--border); background: var(--white); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: var(--text-secondary); transition: all .18s; text-decoration: none; }
+  .vh-back:hover { border-color: var(--purple); color: var(--purple); }
+  .vh-title-wrap { }
+  .vh-title { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+  .vh-meta { display: flex; align-items: center; gap: 10px; margin-top: 3px; flex-wrap: wrap; }
+  .status-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 100px; }
+  .status-active { background: var(--success-bg); color: var(--success); }
+  .vh-date { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .vh-actions { display: flex; align-items: center; gap: 8px; }
+  .btn-vh {
+    padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; cursor: pointer; transition: all .18s;
+    border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary);
+  }
+  .btn-vh:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-vh.primary { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .btn-vh.primary:hover { background: var(--purple-light); }
+
+  /* STATS ROW */
+  .stats-strip {
+    display: flex; gap: 0; border-top: 1px solid var(--border); margin-top: 14px;
+    padding-top: 14px;
+  }
+  .stat-item { display: flex; align-items: center; gap: 8px; padding-right: 24px; margin-right: 24px; border-right: 1px solid var(--border); }
+  .stat-item:last-child { border-right: none; }
+  .stat-num { font-size: 22px; font-weight: 800; letter-spacing: -1px; color: var(--purple); }
+  .stat-lbl { font-size: 12px; color: var(--text-muted); font-weight: 600; line-height: 1.3; }
+
+  /* PAGE LAYOUT */
+  .page { max-width: 1100px; margin: 0 auto; padding: 32px 48px 80px; }
+
+  /* FILTERS */
+  .filters-row { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-label { font-size: 12px; font-weight: 700; color: var(--text-muted); letter-spacing: .04em; margin-right: 4px; }
+  .filter-btn {
+    padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .filter-btn:hover { border-color: var(--purple-mid); color: var(--text-primary); }
+  .filter-btn.active { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .filter-sep { width: 1px; height: 24px; background: var(--border); margin: 0 4px; }
+  .sort-select {
+    padding: 7px 14px; border-radius: 100px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; outline: none;
+  }
+  .results-count { margin-left: auto; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+
+  /* CANDIDATE CARDS */
+  .candidates-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .candidate-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 18px; padding: 22px 24px;
+    transition: all .2s; cursor: pointer;
+    animation: fadeUp .35s ease both;
+  }
+  .candidate-card:hover { border-color: var(--purple-mid); box-shadow: 0 4px 20px rgba(107,78,255,.08); transform: translateY(-1px); }
+  .candidate-card.invited { border-color: var(--success); }
+  .candidate-card.declined { opacity: .5; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+
+  .cc-top { display: flex; align-items: flex-start; gap: 16px; }
+  .cc-avatar {
+    width: 52px; height: 52px; border-radius: 16px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: 800; color: #fff;
+  }
+  .cc-main { flex: 1; min-width: 0; }
+  .cc-name-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+  .cc-name { font-size: 16px; font-weight: 800; letter-spacing: -.3px; }
+  .cc-action-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 100px; }
+  .cc-action-badge.invited { background: var(--success-bg); color: var(--success); }
+  .cc-action-badge.contact { background: var(--purple-soft); color: var(--purple); }
+  .cc-action-badge.declined { background: var(--bg); color: var(--text-muted); }
+  .cc-role { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 10px; }
+
+  /* Match scores */
+  .cc-scores { display: flex; gap: 6px; flex-wrap: wrap; }
+  .score-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 12px; font-weight: 600; padding: 4px 10px;
+    border-radius: 100px; background: var(--bg); color: var(--text-secondary);
+  }
+  .score-tag .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green { background: var(--success); }
+  .dot-yellow { background: var(--warning); }
+  .dot-red { background: var(--error); }
+
+  /* Match circle */
+  .cc-match { flex-shrink: 0; text-align: center; }
+  .match-circle {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 800; line-height: 1; letter-spacing: -1px;
+    border: 3px solid;
+  }
+  .match-circle.high { border-color: var(--success); color: var(--success); background: var(--success-bg); }
+  .match-circle.mid { border-color: var(--warning); color: var(--warning); background: var(--warning-bg); }
+  .match-circle.low { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+  .match-label { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+
+  /* Bottom action bar */
+  .cc-bottom { display: flex; align-items: center; justify-content: space-between; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+  .cc-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .cc-tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: var(--bg); color: var(--text-secondary); }
+  .cc-actions { display: flex; gap: 6px; flex-shrink: 0; }
+  .btn-action {
+    padding: 7px 14px; border-radius: 9px; font-size: 12px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; cursor: pointer; transition: all .18s;
+    border: 1.5px solid var(--border); background: var(--white); color: var(--text-secondary);
+    white-space: nowrap;
+  }
+  .btn-action:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-action.invite { background: var(--purple); color: #fff; border-color: var(--purple); }
+  .btn-action.invite:hover { background: var(--purple-light); }
+  .btn-action.decline:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+  .btn-action.done { background: var(--success-bg); color: var(--success); border-color: var(--success); cursor: default; }
+
+  /* Empty state */
+  .empty-state { text-align: center; padding: 80px 40px; }
+  .empty-state h3 { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+  .empty-state p { font-size: 14px; color: var(--text-secondary); font-weight: 500; }
+
+  /* Share modal */
+  .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,26,46,.5); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box { background: var(--white); border-radius: 20px; padding: 32px; width: 100%; max-width: 460px; box-shadow: 0 24px 64px rgba(26,26,46,.15); transform: translateY(12px) scale(.97); transition: transform .25s ease; }
+  .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; letter-spacing: -.4px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-bottom: 20px; line-height: 1.6; }
+  .share-option { border: 1.5px solid var(--border); border-radius: 13px; padding: 14px 16px; margin-bottom: 10px; }
+  .share-option-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 5px; }
+  .share-option-name { font-size: 13px; font-weight: 700; }
+  .share-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+  .share-badge.pw { background: var(--warning-bg); color: var(--warning); }
+  .share-badge.open { background: var(--success-bg); color: var(--success); }
+  .share-desc { font-size: 12px; color: var(--text-muted); font-weight: 500; margin-bottom: 10px; }
+  .share-link-row { display: flex; gap: 6px; }
+  .share-link-input { flex: 1; padding: 8px 10px; border-radius: 8px; border: 1.5px solid var(--border); font-size: 12px; font-family: 'Manrope',sans-serif; color: var(--text-muted); background: var(--bg); outline: none; }
+  .btn-copy { padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; transition: all .2s; }
+  .btn-copy:hover { background: var(--purple-light); }
+  .btn-copy.copied { background: var(--success); }
+  .btn-modal-close { width: 100%; padding: 12px; border-radius: 12px; margin-top: 12px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-modal-close:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* Decline modal */
+  .decline-options { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+  .decline-opt { padding: 10px 14px; border-radius: 11px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .18s; background: var(--white); font-family: 'Manrope',sans-serif; text-align: left; }
+  .decline-opt:hover { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+  .decline-opt.selected { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+  .btn-decline-confirm { width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--error); color: #fff; border: none; cursor: pointer; transition: all .2s; margin-bottom: 8px; }
+  .btn-decline-confirm:hover { background: #DC2626; }
+
+
+  /* Funnel + AI block */
+  .insights-strip {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    border-top: 1px solid var(--border); margin-top: 14px; padding-top: 16px;
+  }
+
+  /* Funnel */
+  .funnel-wrap { padding-right: 24px; border-right: 1px solid var(--border); }
+  .funnel-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+  .funnel-row { display: flex; align-items: center; gap: 0; }
+  .funnel-step {
+    display: flex; flex-direction: column; align-items: center; flex: 1;
+  }
+  .funnel-num { font-size: 20px; font-weight: 800; letter-spacing: -1px; color: var(--text-primary); line-height: 1; }
+  .funnel-step-lbl { font-size: 10px; color: var(--text-muted); font-weight: 600; text-align: center; margin-top: 3px; line-height: 1.3; }
+  .funnel-step.highlight .funnel-num { color: var(--purple); }
+  .funnel-step.highlight .funnel-step-lbl { color: var(--purple); font-weight: 700; }
+  .funnel-step.highlight { background: var(--purple-soft); border-radius: 10px; padding: 6px 8px; }
+  .funnel-arrow { color: var(--border); font-size: 16px; font-weight: 300; flex-shrink: 0; padding: 0 2px; margin-bottom: 14px; }
+
+  /* AI recommendations */
+  .ai-recs-wrap { padding-left: 24px; }
+  .ai-recs-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
+  .ai-recs-list { display: flex; gap: 10px; }
+  .ai-rec-card {
+    flex: 1; background: var(--bg); border-radius: 12px; padding: 12px 14px;
+    cursor: pointer; transition: all .18s; border: 1.5px solid transparent;
+  }
+  .ai-rec-card:hover { background: var(--purple-soft); border-color: var(--purple-mid); }
+  .ai-rec-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; line-height: 1.35; }
+  .ai-rec-reason { font-size: 11px; color: var(--text-muted); font-weight: 500; line-height: 1.4; }
+  .ai-rec-reason b { color: var(--error); font-weight: 700; }
+
+  @media(max-width:1050px){
+    .insights-strip { grid-template-columns: 1fr; }
+    .funnel-wrap { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 14px; margin-bottom: 14px; }
+    .ai-recs-wrap { padding-left: 0; }
+    .ai-recs-list { flex-wrap: wrap; }
+  }
+
+  @media(max-width:900px){
+    nav{padding:0 20px} .vacancy-header{padding:16px 20px} .page{padding:24px 20px 80px}
+    .vh-actions{flex-wrap:wrap}
+  }
+  .cc-ai-summary {
+    background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
+    border-radius: 12px; padding: 12px 16px; margin-top: 10px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .cc-ai-summary-icon { font-size: 14px; flex-shrink: 0; color: var(--purple); margin-top: 1px; }
+  .cc-ai-summary p { font-size: 13px; color: var(--purple); font-weight: 500; line-height: 1.6; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="window.location.href='yoffer-dashboard.html'">Вакансии</button>
+    <button class="nav-link" onclick="window.location.href='yoffer-contacts.html'">Контакты</button>
+    <button class="nav-link" onclick="window.location.href='yoffer-settings.html'">Настройки</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<!-- VACANCY HEADER -->
+<div class="vacancy-header">
+  <div class="vh-top">
+    <div class="vh-left">
+      <a href="yoffer-dashboard.html" class="vh-back">←</a>
+      <div class="vh-title-wrap">
+        <div class="vh-title">Python Backend Developer</div>
+        <div class="vh-meta">
+          <span class="status-badge status-active">Активна</span>
+          <span class="vh-date">Запущена 17 марта 2026</span>
+          <span class="vh-date">·</span>
+          <span class="vh-date">Обновлено 18 марта 2026</span>
+        </div>
+      </div>
+    </div>
+    <div class="vh-actions">
+      <button class="btn-vh" onclick="window.location.href='yoffer-profile.html'">✎ Профиль</button>
+      <button class="btn-vh" onclick="openTaskEditModal()">📋 Задание</button>
+      <button class="btn-vh" onclick="refreshSearch()">⟳ Обновить поиск</button>
+      <button class="btn-vh" onclick="openShareModal()">↗ Поделиться</button>
+      <button class="btn-vh primary" onclick="window.location.href='yoffer-profile.html'">+ Новая вакансия</button>
+    </div>
+  </div>
+  <div class="stats-strip">
+    <div class="stat-item">
+      <div class="stat-num" id="stat-total">24</div>
+      <div class="stat-lbl">всего<br>совпадений</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--success)" id="stat-high">8</div>
+      <div class="stat-lbl">высокое<br>совпадение</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--warning)" id="stat-mid">11</div>
+      <div class="stat-lbl">среднее<br>совпадение</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" style="color:var(--text-muted)" id="stat-actions">3</div>
+      <div class="stat-lbl">действия<br>выполнены</div>
+    </div>
+  </div>
+
+  <!-- FUNNEL + AI RECS -->
+  <div class="insights-strip">
+
+    <!-- Funnel -->
+    <div class="funnel-wrap">
+      <div class="funnel-label">
+        <span>Воронка кандидатов</span>
+      </div>
+      <div class="funnel-row">
+        <div class="funnel-step">
+          <div class="funnel-num">986</div>
+          <div class="funnel-step-lbl">База<br>кандидатов</div>
+        </div>
+        <div class="funnel-arrow">›</div>
+        <div class="funnel-step">
+          <div class="funnel-num">24</div>
+          <div class="funnel-step-lbl">Отбор<br>по профилю</div>
+        </div>
+        <div class="funnel-arrow">›</div>
+        <div class="funnel-step">
+          <div class="funnel-num" id="funnel-invited">2</div>
+          <div class="funnel-step-lbl">Приглашены<br>к диалогу</div>
+        </div>
+        <div class="funnel-arrow">›</div>
+        <div class="funnel-step">
+          <div class="funnel-num">1</div>
+          <div class="funnel-step-lbl">Тестовое<br>задание</div>
+        </div>
+        <div class="funnel-arrow">›</div>
+        <div class="funnel-step highlight">
+          <div class="funnel-num">0</div>
+          <div class="funnel-step-lbl">Готовы<br>к офферу</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Recommendations -->
+    <div class="ai-recs-wrap">
+      <div class="ai-recs-label">✦ Рекомендации ИИ</div>
+      <div class="ai-recs-list">
+        <div class="ai-rec-card" onclick="applyRec('remote')">
+          <div class="ai-rec-title">Рассмотри гибридный или удалённый формат</div>
+          <div class="ai-rec-reason">Причина отказа <b>4 кандидатов</b></div>
+        </div>
+        <div class="ai-rec-card" onclick="applyRec('salary')">
+          <div class="ai-rec-title">Подними вилку зарплаты на 10–15%</div>
+          <div class="ai-rec-reason">Причина отсева <b>3 кандидатов</b></div>
+        </div>
+        <div class="ai-rec-card" onclick="applyRec('exp')">
+          <div class="ai-rec-title">Сделай опыт с высокой нагрузкой необязательным</div>
+          <div class="ai-rec-reason">Причина отсева <b>324 кандидатов</b></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- FILTERS -->
+  <div class="filters-row">
+    <span class="filter-label">Показать:</span>
+    <button class="filter-btn active" onclick="filterBy('all', this)">Все</button>
+    <button class="filter-btn" onclick="filterBy('high', this)">Высокое совпадение</button>
+    <button class="filter-btn" onclick="filterBy('mid', this)">Среднее</button>
+    <button class="filter-btn" onclick="filterBy('new', this)">Без действия</button>
+    <button class="filter-btn" onclick="filterBy('invited', this)">Приглашённые</button>
+    <div class="filter-sep"></div>
+    <select class="sort-select" onchange="sortBy(this.value)">
+      <option value="match">По совпадению</option>
+      <option value="skills">По навыкам</option>
+      <option value="soft">По soft skills</option>
+      <option value="exp">По опыту</option>
+    </select>
+    <span class="results-count" id="results-count">24 кандидата</span>
+  </div>
+
+  <!-- CANDIDATES -->
+  <div class="candidates-list" id="candidates-list">
+    <!-- Generated by JS -->
+  </div>
+
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal-overlay" id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="modal-box">
+    <div class="modal-title">Поделиться вакансией</div>
+    <div class="modal-sub">Отправьте ссылку коллеге — он сможет посмотреть кандидатов</div>
+    <div class="share-option">
+      <div class="share-option-top">
+        <div class="share-option-name">✎ С редактированием</div>
+        <span class="share-badge pw">Пароль</span>
+      </div>
+      <div class="share-desc">Открывается по паролю, без регистрации</div>
+      <div class="share-link-row">
+        <input class="share-link-input" value="yoffer.app/p/py-back-x7k2/edit" readonly id="link-edit" />
+        <button class="btn-copy" onclick="copyLink('link-edit',this)">Копировать</button>
+      </div>
+    </div>
+    <div class="share-option">
+      <div class="share-option-top">
+        <div class="share-option-name">👁 Только просмотр</div>
+        <span class="share-badge open">Без пароля</span>
+      </div>
+      <div class="share-desc">Видит профиль и кандидатов, не может менять</div>
+      <div class="share-link-row">
+        <input class="share-link-input" value="yoffer.app/p/py-back-x7k2/view" readonly id="link-view" />
+        <button class="btn-copy" onclick="copyLink('link-view',this)">Копировать</button>
+      </div>
+    </div>
+    <button class="btn-modal-close" onclick="closeShareModal()">Закрыть</button>
+  </div>
+</div>
+
+<!-- DECLINE MODAL -->
+<div class="modal-overlay" id="decline-modal" onclick="if(event.target===this)closeDeclineModal()">
+  <div class="modal-box">
+    <div class="modal-title">Причина отказа</div>
+    <div class="modal-sub">Необязательно — но помогает улучшить следующие результаты</div>
+    <div class="decline-options" id="decline-options">
+      <button class="decline-opt" onclick="selectDecline(this)">Не подходит по навыкам</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Недостаточно опыта</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Не подходит по зарплатным ожиданиям</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Не вписывается в команду</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Другая причина</button>
+    </div>
+    <button class="btn-decline-confirm" onclick="confirmDecline()">Подтвердить отказ</button>
+    <button class="btn-modal-close" onclick="closeDeclineModal()">Пропустить причину</button>
+  </div>
+</div>
+
+<script>
+// ── DATA ──
+const candidates = [
+  {
+    id: 1, verif: 1, name: 'Дмитрий К.', initials: 'ДК', color: '#6B4EFF',
+    role: 'Senior Python Developer · 5 лет опыта', match: 94, level: 'high',
+    scores: { skills: 97, exp: 92, soft: 88, cond: 95, psych: 90, ctx: 85 },
+    skills: [{n:'Python',p:96},{n:'FastAPI',p:94},{n:'PostgreSQL',p:91},{n:'Docker',p:88}],
+    tags: ['Python · FastAPI', 'PostgreSQL', 'Remote', '5 000 €'],
+    action: null,
+    summary: { level: 'high', text: 'Запускал backend с нуля в двух продуктовых стартапах — платёжный сервис (FastAPI + PostgreSQL, 50k rps) и маркетплейс. Полный стек совпадает, опыт работы в условиях жёстких дедлайнов подтверждён.' }
+  },
+  {
+    id: 2, verif: 1, name: 'Анна В.', initials: 'АВ', color: '#10B981',
+    role: 'Backend Developer · 4 года опыта', match: 88, level: 'high',
+    scores: { skills: 92, exp: 85, soft: 90, cond: 88, psych: 82, ctx: 91 },
+    skills: [{n:'Python',p:93},{n:'Django',p:90},{n:'Redis',p:85},{n:'PostgreSQL',p:80}],
+    tags: ['Python · Django', 'Redis', 'Гибрид', '4 500 €'],
+    action: 'invited',
+    summary: { level: 'high', text: 'Разрабатывала API для e-commerce платформы (Django + Redis, 1M+ пользователей) и внутренней CRM. Стек близок, опыт продуктовой разработки в команде 5–10 человек.' }
+  },
+  {
+    id: 3, verif: 2, name: 'Михаил Р.', initials: 'МР', color: '#F59E0B',
+    role: 'Python Engineer · 3 года опыта', match: 82, level: 'high',
+    scores: { skills: 88, exp: 76, soft: 85, cond: 80, psych: 88, ctx: 79 },
+    skills: [{n:'Python',p:88},{n:'Flask',p:82},{n:'Docker',p:79},{n:'MySQL',p:71}],
+    tags: ['Python · Flask', 'Docker', 'Remote', '3 800 €'],
+    action: null,
+    summary: { level: 'high', text: 'Строил микросервисы для логистической платформы (Flask + Docker), участвовал в миграции монолита. Опыт 3 года, ключевые навыки совпадают, высокая нагрузка — частично.' }
+  },
+  {
+    id: 4, verif: 2, name: 'Елена С.', initials: 'ЕС', color: '#8B5CF6',
+    role: 'Backend Developer · 4 года опыта', match: 79, level: 'high',
+    scores: { skills: 84, exp: 80, soft: 72, cond: 76, psych: 80, ctx: 83 },
+    skills: [{n:'Python',p:84},{n:'FastAPI',p:80},{n:'PostgreSQL',p:76},{n:'Redis',p:68}],
+    tags: ['Python · FastAPI', 'PostgreSQL', 'Remote', '4 200 €'],
+    action: null,
+    summary: { level: 'high', text: 'Работала над backend финтех-приложения (FastAPI + PostgreSQL), реализовала модуль авторизации и уведомлений. Soft skills чуть ниже ожидаемого, остальное совпадает.' }
+  },
+  {
+    id: 5, verif: 2, name: 'Артём Л.', initials: 'АЛ', color: '#EC4899',
+    role: 'Python Backend · 6 лет опыта', match: 76, level: 'high',
+    scores: { skills: 80, exp: 88, soft: 68, cond: 72, psych: 75, ctx: 70 },
+    skills: [{n:'Python',p:91},{n:'DRF',p:80},{n:'Kubernetes',p:77},{n:'PostgreSQL',p:72}],
+    tags: ['Python · DRF', 'Kubernetes', 'Офис · Рига', '5 500 €'],
+    action: 'contact',
+    summary: { level: 'high', text: 'Ведёт backend крупного SaaS (DRF + Kubernetes, 100k+ rps), опыт 6 лет. Технически сильный, но зарплатные ожидания выше вилки и формат — только офис.' }
+  },
+  {
+    id: 6, verif: 3, name: 'Николай Ф.', initials: 'НФ', color: '#06B6D4',
+    role: 'Software Engineer · 3 года опыта', match: 71, level: 'mid',
+    scores: { skills: 75, exp: 70, soft: 74, cond: 68, psych: 72, ctx: 65 },
+    skills: [{n:'Python',p:75},{n:'FastAPI',p:70},{n:'MongoDB',p:68},{n:'Docker',p:60}],
+    tags: ['Python · FastAPI', 'MongoDB', 'Remote', '3 500 €'],
+    action: null,
+    summary: { level: 'mid', text: 'Участвовал в разработке B2B-платформы (FastAPI + MongoDB), опыт небольших команд. Высокой нагрузки в резюме нет — подходит на задачи среднего масштаба.' }
+  },
+  {
+    id: 7, verif: 3, name: 'Ксения П.', initials: 'КП', color: '#F97316',
+    role: 'Backend Developer · 2 года опыта', match: 67, level: 'mid',
+    scores: { skills: 72, exp: 58, soft: 80, cond: 65, psych: 70, ctx: 62 },
+    skills: [{n:'Python',p:72},{n:'Django',p:65},{n:'PostgreSQL',p:60},{n:'Git',p:55}],
+    tags: ['Python · Django', 'PostgreSQL', 'Remote', '3 000 €'],
+    action: null,
+    summary: { level: 'mid', text: 'Работала над учебными проектами и небольшим Django-сервисом. Продакшн-опыта с нагрузкой нет — риск на самостоятельную работу с нуля.' }
+  },
+  {
+    id: 8, verif: 3, name: 'Павел Г.', initials: 'ПГ', color: '#84CC16',
+    role: 'Python Developer · 4 года опыта', match: 63, level: 'mid',
+    scores: { skills: 68, exp: 72, soft: 60, cond: 58, psych: 62, ctx: 55 },
+    skills: [{n:'Python',p:68},{n:'Flask',p:62},{n:'MySQL',p:58},{n:'REST',p:50}],
+    tags: ['Python · Flask', 'MySQL', 'Гибрид', '4 000 €'],
+    action: 'declined',
+    summary: { level: 'low', text: 'Опыт в корпоративных интеграциях (Flask + MySQL), без продуктовой разработки. Стек и психотип слабо совпадают с требованиями вакансии.' }
+  },
+];
+
+let currentFilter = 'all';
+let currentSort = 'match';
+let declineTargetId = null;
+
+// ── RENDER ──
+function renderCandidates() {
+  const list = document.getElementById('candidates-list');
+  let filtered = candidates.filter(c => {
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'high') return c.level === 'high';
+    if (currentFilter === 'mid') return c.level === 'mid';
+    if (currentFilter === 'new') return !c.action;
+    if (currentFilter === 'invited') return c.action === 'invited';
+    return true;
+  });
+
+  document.getElementById('results-count').textContent = filtered.length + ' кандидат' + plural(filtered.length);
+
+  // Sort by verif level first, then by selected sort
+  filtered.sort((a, b) => {
+    if (a.verif !== b.verif) return a.verif - b.verif;
+    if (currentSort === 'match') return b.match - a.match;
+    if (currentSort === 'skills') return b.scores.skills - a.scores.skills;
+    if (currentSort === 'soft') return b.scores.soft - a.scores.soft;
+    if (currentSort === 'exp') return b.scores.exp - a.scores.exp;
+    return 0;
+  });
+
+  const levelDefs = [
+    { key: 1, cls: 'l1', icon: '⭐', title: 'Решили кейс компании' },
+    { key: 2, cls: 'l2', icon: '✓', title: 'Прошли верификацию' },
+    { key: 3, cls: 'l3', icon: '◦', title: 'Базовая верификация' },
+  ];
+
+  let sectionsHtml = '';
+  let globalIdx = 0;
+  levelDefs.forEach(lv => {
+    const group = filtered.filter(c => c.verif === lv.key);
+    if (!group.length) return;
+    const cnt = group.length;
+    const cntLabel = cnt + ' кандидат' + (cnt === 1 ? '' : cnt < 5 ? 'а' : 'ов');
+    sectionsHtml += `<div class="level-section">
+      <div class="level-header">
+        <div class="level-pill ${lv.cls}"><span class="level-pill-icon">${lv.icon}</span>${lv.title}</div>
+        <div class="level-divider ${lv.cls}"></div>
+        <span class="level-count">${cntLabel}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">${group.map((c, i) => {
+    const delay = (globalIdx++ * 0.05);
+    const circleClass = c.match >= 80 ? 'high' : c.match >= 65 ? 'mid' : 'low';
+    const cardClass = c.action === 'invited' ? 'invited' : c.action === 'declined' ? 'declined' : '';
+    const actionBadge = c.action ? `<span class="cc-action-badge ${c.action}">${actionLabel(c.action)}</span>` : '';
+    const aiText = c.summary ? c.summary.text : '';
+    const verifLabel = c.verif === 1 ? '⭐ Решил кейс' : c.verif === 2 ? '✓ Верифицирован' : '◦ Базовая верификация';
+    const verifCls = c.verif === 1 ? 'l1' : c.verif === 2 ? 'l2' : 'l3';
+    const tags = c.tags.map(t => `<span class="cc-tag">${t}</span>`).join('');
+
+    const inviteBtn = c.action === 'invited'
+      ? `<button class="btn-action done" disabled>✓ Приглашён</button>`
+      : c.action === 'contact'
+      ? `<button class="btn-action done" style="background:var(--purple-soft);color:var(--purple);border-color:var(--purple-mid)" disabled>✓ Контакт запрошен</button>`
+      : `<button class="btn-action invite" onclick="event.stopPropagation();inviteCandidate(${c.id})">Пригласить</button>`;
+
+    const contactBtn = (!c.action)
+      ? `<button class="btn-action" onclick="event.stopPropagation();requestContact(${c.id})">Запросить контакт</button>`
+      : '';
+
+    const declineBtn = c.action !== 'declined'
+      ? `<button class="btn-action decline" onclick="event.stopPropagation();openDeclineModal(${c.id})">✕ Не подходит</button>`
+      : `<button class="btn-action" style="cursor:default;opacity:.5" disabled>Отклонён</button>`;
+
+    return `
+      <div class="candidate-card ${cardClass}" style="animation-delay:${delay}s" onclick="openCandidate(${c.id})">
+        <div class="cc-top">
+          <div class="cc-avatar" style="background:${c.color}">${c.initials}</div>
+          <div class="cc-main">
+            <div class="cc-name-row">
+              <span class="cc-name">${c.name}</span>
+              <span class="verif-badge ${verifCls}">${verifLabel}</span>
+              ${actionBadge}
+            </div>
+            <div class="cc-role">${c.role}</div>
+            ${aiText ? `<div class="cc-ai-summary"><div class="cc-ai-summary-icon">✦</div><p>${aiText}</p></div>` : ''}
+          </div>
+          <div class="cc-match">
+            <div class="match-circle ${circleClass}">${c.match}<span style="font-size:11px;font-weight:600">%</span></div>
+            <div class="match-label">совпадение</div>
+          </div>
+        </div>
+        <div class="cc-bottom">
+          <div class="cc-tags">${tags}</div>
+          <div class="cc-actions">${inviteBtn}${contactBtn}${declineBtn}</div>
+        </div>
+      </div>`;
+  }).join('')}</div></div>`;
+  });
+
+  list.innerHTML = sectionsHtml || `<div class="empty-state"><h3>Нет кандидатов</h3><p>Попробуйте изменить фильтр</p></div>`;
+}
+
+function plural(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return '';
+  if ([2,3,4].includes(n % 10) && ![12,13,14].includes(n % 100)) return 'а';
+  return 'ов';
+}
+
+function actionLabel(a) {
+  if (a === 'invited') return 'Приглашён';
+  if (a === 'contact') return 'Контакт запрошен';
+  if (a === 'declined') return 'Отклонён';
+  return '';
+}
+
+// ── ACTIONS ──
+function inviteCandidate(id) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+  c.action = 'invited';
+  updateStats();
+  renderCandidates();
+}
+
+function requestContact(id) {
+  const c = candidates.find(x => x.id === id);
+  if (!c) return;
+  c.action = 'contact';
+  updateStats();
+  renderCandidates();
+}
+
+function openDeclineModal(id) {
+  declineTargetId = id;
+  document.querySelectorAll('.decline-opt').forEach(o => o.classList.remove('selected'));
+  document.getElementById('decline-modal').classList.add('show');
+}
+
+function closeDeclineModal() {
+  document.getElementById('decline-modal').classList.remove('show');
+  declineTargetId = null;
+}
+
+function selectDecline(btn) {
+  document.querySelectorAll('.decline-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function confirmDecline() {
+  if (declineTargetId === null) return;
+  const c = candidates.find(x => x.id === declineTargetId);
+  if (c) { c.action = 'declined'; updateStats(); renderCandidates(); }
+  closeDeclineModal();
+}
+
+function openCandidate(id) {
+  window.location.href = 'yoffer-candidate.html?id=' + id;
+}
+
+// ── FILTERS & SORT ──
+function filterBy(val, btn) {
+  currentFilter = val;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCandidates();
+}
+
+function sortBy(val) {
+  currentSort = val;
+  renderCandidates();
+}
+
+// ── STATS ──
+function updateStats() {
+  const high = candidates.filter(c => c.match >= 75).length;
+  const mid = candidates.filter(c => c.match >= 55 && c.match < 75).length;
+  const actions = candidates.filter(c => c.action).length;
+  document.getElementById('stat-total').textContent = candidates.length;
+  document.getElementById('stat-high').textContent = high;
+  document.getElementById('stat-mid').textContent = mid;
+  document.getElementById('stat-actions').textContent = actions;
+}
+
+// ── SHARE ──
+function openShareModal() { document.getElementById('share-modal').classList.add('show'); }
+function closeShareModal() { document.getElementById('share-modal').classList.remove('show'); }
+function copyLink(id, btn) {
+  navigator.clipboard.writeText('https://' + document.getElementById(id).value).catch(() => {});
+  btn.textContent = 'Скопировано ✓'; btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'Копировать'; btn.classList.remove('copied'); }, 2000);
+}
+
+
+function openTaskEditModal() {
+  const pub = localStorage.getItem('yoffer_task_public') || '';
+  const per = localStorage.getItem('yoffer_task_personal') || '';
+  document.getElementById('vac-public-task').value = pub;
+  document.getElementById('vac-personal-task').value = per;
+  document.getElementById('task-edit-modal').classList.add('show');
+}
+function closeTaskEditModal() {
+  document.getElementById('task-edit-modal').classList.remove('show');
+}
+function switchVacTaskTab(tab, btn) {
+  document.querySelectorAll('.task-tab-v').forEach(b => { b.style.color='var(--text-secondary)'; b.style.borderBottomColor='transparent'; });
+  btn.style.color='var(--purple)'; btn.style.borderBottomColor='var(--purple)';
+  document.getElementById('vac-task-pane-public').style.display = tab==='public' ? 'block' : 'none';
+  document.getElementById('vac-task-pane-personal').style.display = tab==='personal' ? 'block' : 'none';
+}
+function saveVacTask() {
+  const pub = document.getElementById('vac-public-task').value.trim();
+  const per = document.getElementById('vac-personal-task').value.trim();
+  if (pub) localStorage.setItem('yoffer_task_public', pub);
+  if (per) localStorage.setItem('yoffer_task_personal', per);
+  closeTaskEditModal();
+  showToast('Задание сохранено');
+}
+
+function applyRec(type) {
+  const msgs = {
+    remote: 'Откроем редактирование условий — вы можете изменить формат работы.',
+    salary: 'Откроем редактирование условий — вы можете скорректировать вилку.',
+    exp: 'Откроем редактирование профиля — вы можете изменить обязательность навыков.',
+  };
+  const actions = {
+    remote: () => window.location.href = 'yoffer-profile.html',
+    salary: () => window.location.href = 'yoffer-profile.html',
+    exp: () => window.location.href = 'yoffer-profile.html',
+  };
+  if (confirm(msgs[type] + '\n\nПерейти к редактированию?')) actions[type]();
+}
+
+function refreshSearch() {
+  const btn = document.querySelector('[onclick="refreshSearch()"]');
+  btn.textContent = '⟳ Обновляем...';
+  btn.disabled = true;
+  setTimeout(() => { btn.textContent = '⟳ Обновить поиск'; btn.disabled = false; }, 1500);
+}
+
+// ── INIT ──
+renderCandidates();
+</script>
+
+<!-- TASK EDIT MODAL (from vacancy page) -->
+<div class="modal-overlay" id="task-edit-modal" onclick="if(event.target===this)closeTaskEditModal()">
+  <div class="modal-box" style="max-width:520px">
+    <div class="modal-title">Задания для кандидатов</div>
+    <div class="modal-sub" style="margin-bottom:0">Управляйте заданиями не выходя со страницы вакансии</div>
+
+    <div style="display:flex;border-bottom:1px solid var(--border);margin:16px -32px 0;padding:0 32px">
+      <button class="task-tab-v active" onclick="switchVacTaskTab('public',this)" style="flex:1;padding:10px 0;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;border:none;background:none;cursor:pointer;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s">🌐 Публичный кейс</button>
+      <button class="task-tab-v" onclick="switchVacTaskTab('personal',this)" style="flex:1;padding:10px 0;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;border:none;background:none;cursor:pointer;color:var(--text-secondary);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .18s">🎯 Персональный шаблон</button>
+    </div>
+
+    <div id="vac-task-pane-public" style="padding-top:16px">
+      <div style="font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:10px;line-height:1.6">Кейс виден всем кандидатам платформы. Лучшие решения → Уровень 1.</div>
+      <textarea id="vac-public-task" style="width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid var(--border);font-size:13px;font-family:Manrope,sans-serif;outline:none;resize:vertical;min-height:110px;line-height:1.65;background:var(--bg);color:var(--text-primary)" placeholder="Опишите публичный бизнес-кейс..."></textarea>
+    </div>
+
+    <div id="vac-task-pane-personal" style="padding-top:16px;display:none">
+      <div style="font-size:13px;color:var(--text-secondary);font-weight:500;margin-bottom:10px;line-height:1.6">Шаблон для персональной отправки конкретному кандидату с его карточки.</div>
+      <textarea id="vac-personal-task" style="width:100%;padding:11px 14px;border-radius:11px;border:1.5px solid var(--border);font-size:13px;font-family:Manrope,sans-serif;outline:none;resize:vertical;min-height:110px;line-height:1.65;background:var(--bg);color:var(--text-primary)" placeholder="Опишите персональное задание..."></textarea>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px">
+      <button onclick="saveVacTask()" style="flex:1;padding:11px;border-radius:12px;font-size:14px;font-weight:700;font-family:Manrope,sans-serif;background:var(--purple);color:#fff;border:none;cursor:pointer">Сохранить</button>
+      <button onclick="closeTaskEditModal()" style="padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;background:var(--bg);color:var(--text-secondary);border:1.5px solid var(--border);cursor:pointer">Отмена</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Кандидат</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+    --warning: #F59E0B;
+    --warning-bg: #FFFBEB;
+    --error: #EF4444;
+    --error-bg: #FEF2F2;
+  }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .nav-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .nav-name { font-size: 14px; font-weight: 600; }
+  .btn-back-nav {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 14px; font-weight: 600; color: var(--text-secondary);
+    text-decoration: none; padding: 8px 14px; border-radius: 10px;
+    border: 1.5px solid var(--border); background: var(--white);
+    transition: all .18s; cursor: pointer;
+  }
+  .btn-back-nav:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* PAGE */
+  .page { max-width: 1100px; margin: 0 auto; padding: 36px 48px 80px; display: grid; grid-template-columns: 1fr 300px; gap: 24px; align-items: start; }
+
+  /* ── LEFT ── */
+  .left-col { display: flex; flex-direction: column; gap: 16px; }
+
+  /* Candidate header */
+  .cand-header {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 28px 32px;
+    animation: fadeUp .35s ease both;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+  .ch-top { display: flex; align-items: flex-start; gap: 20px; }
+  .ch-avatar {
+    width: 72px; height: 72px; border-radius: 20px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 26px; font-weight: 800; color: #fff; background: #6B4EFF;
+  }
+  .ch-info { flex: 1; }
+  .ch-name { font-size: 24px; font-weight: 800; letter-spacing: -.6px; margin-bottom: 4px; }
+  .ch-role { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-bottom: 12px; }
+  .ch-tags { display: flex; gap: 7px; flex-wrap: wrap; }
+  .ch-tag { font-size: 13px; font-weight: 600; padding: 4px 12px; border-radius: 100px; background: var(--bg); color: var(--text-secondary); }
+  .ch-match-big { flex-shrink: 0; text-align: center; }
+  .match-big-num { font-size: 52px; font-weight: 800; letter-spacing: -2px; color: var(--success); line-height: 1; }
+  .match-big-label { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+  .match-big-sub { font-size: 11px; color: var(--success); font-weight: 700; margin-top: 2px; }
+
+  /* Overall bar */
+  .overall-bar-wrap { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .ob-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
+  .ob-bars { display: flex; flex-direction: column; gap: 8px; }
+  .ob-row { display: flex; align-items: center; gap: 10px; }
+  .ob-name { font-size: 12px; font-weight: 600; color: var(--text-secondary); width: 90px; flex-shrink: 0; }
+  .ob-bar-wrap { flex: 1; height: 7px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+  .ob-bar { height: 100%; border-radius: 4px; transition: width .6s ease; }
+  .ob-bar.green { background: var(--success); }
+  .ob-bar.yellow { background: var(--warning); }
+  .ob-bar.red { background: var(--error); }
+  .ob-bar.purple { background: var(--purple); }
+  .ob-pct { font-size: 12px; font-weight: 700; width: 36px; text-align: right; flex-shrink: 0; }
+  .ob-weight { font-size: 10px; color: var(--text-muted); font-weight: 600; width: 28px; flex-shrink: 0; }
+
+  /* Block cards */
+  .block-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 22px 28px;
+    animation: fadeUp .35s ease both;
+  }
+  .block-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .block-title-wrap { display: flex; align-items: center; gap: 8px; }
+  .block-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); letter-spacing: .05em; text-transform: uppercase; }
+  .block-weight { font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg); padding: 3px 8px; border-radius: 100px; }
+  .block-score {
+    font-size: 15px; font-weight: 800; padding: 4px 12px; border-radius: 100px;
+  }
+  .block-score.high { background: var(--success-bg); color: var(--success); }
+  .block-score.mid { background: var(--warning-bg); color: var(--warning); }
+  .block-score.low { background: var(--error-bg); color: var(--error); }
+
+  /* Skill match rows */
+  .skill-match-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 9px 0; border-bottom: 1px solid var(--border);
+  }
+  .skill-match-row:last-child { border-bottom: none; }
+  .smr-icon { font-size: 14px; width: 20px; flex-shrink: 0; }
+  .smr-name { font-size: 14px; font-weight: 700; flex: 1; }
+  .smr-dir { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .smr-badge { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 100px; }
+  .smr-badge.match { background: var(--success-bg); color: var(--success); }
+  .smr-badge.partial { background: var(--warning-bg); color: var(--warning); }
+  .smr-badge.miss { background: var(--error-bg); color: var(--error); }
+  .smr-badge.bonus { background: var(--purple-soft); color: var(--purple); }
+
+
+  /* Skill % badge */
+  .smr-pct-badge {
+    font-size: 12px; font-weight: 800; padding: 3px 9px;
+    border-radius: 100px; flex-shrink: 0; white-space: nowrap;
+  }
+  .smr-pct-badge.high { background: var(--success-bg); color: var(--success); }
+  .smr-pct-badge.mid  { background: var(--warning-bg); color: var(--warning); }
+  .smr-pct-badge.low  { background: var(--purple-soft); color: var(--purple); }
+
+  /* Soft skill match */
+  .soft-match-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .soft-match-row:last-child { margin-bottom: 0; }
+  .smr-soft-name { font-size: 13px; font-weight: 600; flex: 1; }
+  .smr-soft-bars { display: flex; gap: 3px; }
+  .soft-pip { width: 12px; height: 12px; border-radius: 3px; background: var(--border); }
+  .soft-pip.filled { background: var(--purple); }
+  .soft-pip.gap { background: var(--warning); opacity: .5; }
+  .smr-soft-delta { font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 100px; }
+  .smr-soft-delta.match { background: var(--success-bg); color: var(--success); }
+  .smr-soft-delta.close { background: var(--warning-bg); color: var(--warning); }
+  .smr-soft-delta.gap { background: var(--error-bg); color: var(--error); }
+
+  /* Tag groups */
+  .tags-wrap { display: flex; flex-wrap: wrap; gap: 7px; }
+  .tag { font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 100px; }
+  .tag.match { background: var(--success-bg); color: var(--success); }
+  .tag.miss { background: var(--error-bg); color: var(--error); }
+  .tag.neutral { background: var(--bg); color: var(--text-secondary); }
+  .tag.bonus { background: var(--purple-soft); color: var(--purple); }
+
+  /* AI comment */
+  .ai-comment {
+    background: var(--purple-soft); border: 1.5px solid var(--purple-mid);
+    border-radius: 12px; padding: 12px 16px; margin-top: 14px;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .ai-comment-icon { font-size: 16px; flex-shrink: 0; }
+  .ai-comment p { font-size: 13px; color: var(--purple); font-weight: 500; line-height: 1.6; }
+  .ai-comment b { font-weight: 700; }
+
+  /* ── RIGHT ── */
+  .right-col { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 80px; }
+
+  /* Action card */
+  .action-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 22px;
+    animation: fadeUp .35s .1s ease both;
+  }
+  .action-card h3 { font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+  .action-card p { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 18px; line-height: 1.5; }
+  .btn-main-action {
+    width: 100%; padding: 13px; border-radius: 13px; font-size: 14px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s; margin-bottom: 8px;
+    box-shadow: 0 4px 16px rgba(107,78,255,.25);
+  }
+  .btn-main-action:hover { background: var(--purple-light); transform: translateY(-1px); }
+  .btn-main-action.done { background: var(--success); box-shadow: none; cursor: default; }
+  .btn-main-action.done:hover { transform: none; }
+  .btn-secondary-action {
+    width: 100%; padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: var(--white);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; margin-bottom: 8px;
+  }
+  .btn-secondary-action:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-secondary-action:last-child { margin-bottom: 0; }
+  .btn-decline-action {
+    width: 100%; padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--error); background: var(--white);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s;
+  }
+  .btn-decline-action:hover { border-color: var(--error); background: var(--error-bg); }
+
+  /* Nav arrows */
+  .nav-arrows {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 16px 18px;
+    animation: fadeUp .35s .15s ease both;
+  }
+  .nav-arrows p { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
+  .nav-arrow-btns { display: flex; gap: 8px; }
+  .btn-arrow {
+    flex: 1; padding: 9px; border-radius: 10px; font-size: 13px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border);
+    background: var(--white); color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .btn-arrow:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-arrow:disabled { opacity: .35; cursor: not-allowed; }
+
+  /* Summary card */
+  .summary-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 16px; padding: 18px 20px;
+    animation: fadeUp .35s .2s ease both;
+  }
+  .summary-card h4 { font-size: 13px; font-weight: 700; color: var(--text-secondary); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 12px; }
+  .summary-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+  .summary-row:last-child { margin-bottom: 0; }
+  .summary-key { font-weight: 500; color: var(--text-secondary); }
+  .summary-val { font-weight: 700; color: var(--text-primary); }
+
+  /* Decline modal */
+  .modal-overlay { position: fixed; inset: 0; z-index: 200; background: rgba(26,26,46,.5); backdrop-filter: blur(6px); display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay.show { opacity: 1; pointer-events: all; }
+  .modal-box { background: var(--white); border-radius: 20px; padding: 32px; width: 100%; max-width: 420px; box-shadow: 0 24px 64px rgba(26,26,46,.15); transform: translateY(12px) scale(.97); transition: transform .25s ease; }
+  .modal-overlay.show .modal-box { transform: translateY(0) scale(1); }
+  .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .modal-sub { font-size: 14px; color: var(--text-secondary); font-weight: 500; margin-bottom: 18px; line-height: 1.6; }
+  .decline-options { display: flex; flex-direction: column; gap: 7px; margin-bottom: 16px; }
+  .decline-opt { padding: 10px 14px; border-radius: 11px; border: 1.5px solid var(--border); font-size: 13px; font-weight: 600; cursor: pointer; transition: all .18s; background: var(--white); font-family: 'Manrope',sans-serif; text-align: left; }
+  .decline-opt:hover, .decline-opt.selected { border-color: var(--error); background: var(--error-bg); color: var(--error); }
+  .btn-decline-confirm { width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--error); color: #fff; border: none; cursor: pointer; margin-bottom: 8px; }
+  .btn-modal-close { width: 100%; padding: 11px; border-radius: 12px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; background: var(--bg); color: var(--text-secondary); border: 1.5px solid var(--border); cursor: pointer; }
+
+
+  .btn-undo {
+    width: 100%; padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-muted); background: none;
+    border: none; cursor: pointer; transition: color .18s; margin-top: 2px;
+    display: none;
+  }
+  .btn-undo:hover { color: var(--text-primary); }
+  .btn-undo.show { display: block; }
+  .btn-task {
+    width: 100%; padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: var(--white);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; margin-bottom: 8px;
+    text-align: center;
+  }
+  .btn-task:hover { border-color: var(--warning); color: var(--warning); background: var(--warning-bg); }
+  .btn-task.sent { border-color: var(--warning); color: var(--warning); background: var(--warning-bg); cursor: default; }
+
+  /* Video interview button */
+  .btn-video {
+    width: 100%; padding: 11px; border-radius: 13px; font-size: 13px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-secondary);
+    background: var(--white); border: 1.5px solid var(--border);
+    cursor: pointer; transition: all .2s; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .btn-video:hover { border-color: var(--error); color: var(--error); background: var(--error-bg); }
+  .btn-video .video-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--error); flex-shrink: 0; }
+
+  /* Video modal */
+  .video-modal-inner { aspect-ratio: 16/9; background: #0F0F0F; border-radius: 12px; overflow: hidden; position: relative; margin-bottom: 16px; display: flex; align-items: center; justify-content: center; }
+  .video-play-btn { width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.15); border: 2px solid rgba(255,255,255,.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all .2s; backdrop-filter: blur(4px); }
+  .video-play-btn:hover { background: rgba(255,255,255,.25); transform: scale(1.05); }
+  .video-play-icon { font-size: 24px; margin-left: 4px; }
+  .video-meta { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .video-meta-info p { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+  .video-meta-info span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .video-duration { font-size: 13px; font-weight: 700; color: var(--text-secondary); background: var(--bg); padding: 4px 12px; border-radius: 100px; }
+  .video-chapters { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+  .video-chapter { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: all .15s; }
+  .video-chapter:hover { background: var(--bg); }
+  .video-chapter-time { font-size: 11px; font-weight: 700; color: var(--text-muted); width: 36px; flex-shrink: 0; }
+  .video-chapter-label { font-size: 13px; font-weight: 600; flex: 1; }
+  .video-chapter-score { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 100px; }
+  .video-chapter-score.good { background: var(--success-bg); color: var(--success); }
+  .video-chapter-score.ok   { background: var(--warning-bg); color: var(--warning); }
+
+  /* Task modal */
+  .task-modal-body { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  .task-option {
+    padding: 12px 16px; border-radius: 12px; border: 1.5px solid var(--border);
+    cursor: pointer; transition: all .18s; background: var(--white);
+    font-family: 'Manrope',sans-serif; text-align: left;
+  }
+  .task-option:hover, .task-option.selected { border-color: var(--warning); background: var(--warning-bg); }
+  .task-option-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+  .task-option-desc { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
+  .task-textarea {
+    width: 100%; padding: 11px 14px; border-radius: 11px; border: 1.5px solid var(--border);
+    font-size: 13px; font-family: 'Manrope',sans-serif; outline: none; resize: vertical;
+    min-height: 80px; transition: border-color .2s; color: var(--text-primary);
+  }
+  .task-textarea:focus { border-color: var(--warning); box-shadow: 0 0 0 3px rgba(245,158,11,.08); }
+  .btn-task-send {
+    width: 100%; padding: 12px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; background: var(--warning); color: #fff;
+    border: none; cursor: pointer; margin-bottom: 8px; transition: all .2s;
+  }
+  .btn-task-send:hover { background: #D97706; }
+
+
+  /* Tabs */
+  .tabs-row {
+    display: flex; gap: 4px; background: var(--bg);
+    border-radius: 14px; padding: 4px; margin-bottom: 4px;
+  }
+  .tab-btn {
+    flex: 1; padding: 9px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; border: none; background: none;
+    color: var(--text-secondary); cursor: pointer; transition: all .18s;
+  }
+  .tab-btn:hover { color: var(--text-primary); }
+  .tab-btn.active { background: var(--white); color: var(--purple); box-shadow: 0 1px 6px rgba(0,0,0,.08); }
+  .tab-pane { display: none; flex-direction: column; gap: 16px; }
+  .tab-pane.active { display: flex; }
+
+
+  /* Case solution tab */
+  .case-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 24px 28px; animation: fadeUp .35s ease both; }
+  .case-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .case-rank-big { text-align: center; flex-shrink: 0; }
+  .case-rank-num { font-size: 40px; font-weight: 800; letter-spacing: -2px; color: var(--purple); line-height: 1; }
+  .case-rank-sub { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+  .case-rank-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 100px; margin-top: 6px; display: inline-block; }
+  .case-rank-badge.top { background: #FEF3C7; color: #92400E; }
+  .case-rank-badge.mid { background: var(--success-bg); color: var(--success); }
+  .case-section-label { font-size: 11px; font-weight: 700; color: var(--text-muted); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 8px; }
+  .case-task-box { background: var(--bg); border-radius: 12px; padding: 14px 16px; font-size: 13px; color: var(--text-secondary); font-weight: 500; line-height: 1.7; margin-bottom: 18px; border-left: 3px solid var(--border); }
+  .case-solution-box { background: var(--bg); border-radius: 12px; padding: 14px 16px; font-size: 13px; color: var(--text-primary); font-weight: 500; line-height: 1.75; margin-bottom: 12px; }
+  .case-solution-link { display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border-radius: 10px; background: var(--white); border: 1.5px solid var(--border); font-size: 13px; font-weight: 600; color: var(--purple); text-decoration: none; transition: all .18s; margin-bottom: 18px; }
+  .case-solution-link:hover { border-color: var(--purple); background: var(--purple-soft); }
+  .case-score-row { display: flex; gap: 10px; margin-bottom: 18px; }
+  .case-score-item { flex: 1; background: var(--bg); border-radius: 12px; padding: 12px 14px; text-align: center; }
+  .case-score-item-num { font-size: 24px; font-weight: 800; letter-spacing: -1px; }
+  .case-score-item-lbl { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+  .case-score-item.high .case-score-item-num { color: var(--success); }
+  .case-score-item.mid .case-score-item-num { color: var(--warning); }
+  .case-score-item.low .case-score-item-num { color: var(--error); }
+  .case-no-solution { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .case-no-solution-icon { font-size: 40px; margin-bottom: 12px; }
+  .case-no-solution h3 { font-size: 16px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
+  .case-no-solution p { font-size: 13px; font-weight: 500; line-height: 1.6; }
+
+  /* Experience tab */
+  .exp-card {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 20px; padding: 24px 28px;
+    animation: fadeUp .35s ease both;
+  }
+
+  /* Experience items (after upload) */
+  .exp-list { display: flex; flex-direction: column; gap: 16px; }
+  .exp-item { border-bottom: 1px solid var(--border); padding-bottom: 16px; }
+  .exp-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .exp-item-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+  .exp-company { font-size: 15px; font-weight: 800; letter-spacing: -.3px; }
+  .exp-period { font-size: 12px; font-weight: 600; color: var(--text-muted); white-space: nowrap; }
+  .exp-role-line { font-size: 13px; font-weight: 600; color: var(--purple); margin-bottom: 8px; }
+  .exp-desc { font-size: 13px; color: var(--text-secondary); font-weight: 500; line-height: 1.7; }
+  .exp-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .exp-tag { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: var(--bg); color: var(--text-secondary); }
+  .exp-relevance {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; padding: 3px 10px;
+    border-radius: 100px; margin-top: 10px;
+  }
+  .exp-relevance.high { background: var(--success-bg); color: var(--success); }
+  .exp-relevance.mid  { background: var(--warning-bg); color: var(--warning); }
+  .exp-relevance.low  { background: var(--bg); color: var(--text-muted); }
+
+  @media(max-width:900px){
+    nav{padding:0 20px} .page{grid-template-columns:1fr;padding:24px 20px 80px}
+    .right-col{position:static}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-right">
+    <a href="yoffer-vacancy.html" class="btn-back-nav">← Все кандидаты</a>
+    <span class="nav-name">Алексей И.</span>
+    <div class="nav-avatar">АИ</div>
+  </div>
+</nav>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- LEFT -->
+  <div class="left-col">
+
+    <!-- Candidate header -->
+    <div class="cand-header">
+      <div class="ch-top">
+        <div class="ch-avatar" id="cand-avatar">ДК</div>
+        <div class="ch-info">
+          <div class="ch-name" id="cand-name">Дмитрий К.</div>
+          <div class="ch-role" id="cand-role">Senior Python Developer · 5 лет опыта</div>
+          <div class="ch-tags">
+            <span class="ch-tag">🌍 Remote</span>
+            <span class="ch-tag">💰 5 000 €</span>
+            <span class="ch-tag">⚡ Готов сразу</span>
+          </div>
+          <div style="margin-top:8px"><span id="cand-verif-badge" style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:100px;background:#FEF3C7;color:#92400E;border:1.5px solid #FDE68A">⭐ Решил кейс компании</span></div>
+        </div>
+        <div class="ch-match-big">
+          <div class="match-big-num" id="cand-match">94%</div>
+          <div class="match-big-label">совпадение</div>
+          <div class="match-big-sub">↑ Топ кандидат</div>
+        </div>
+      </div>
+
+      <!-- Overall bars -->
+      <div class="overall-bar-wrap">
+        <div class="ob-label">Разбивка по блокам</div>
+        <div class="ob-bars" id="ob-bars">
+          <!-- rendered by JS -->
+        </div>
+      </div>
+
+      <!-- AI Overall Verdict -->
+      <div class="ai-comment" style="margin-top:20px">
+        <div class="ai-comment-icon">✦</div>
+        <p><b>Рекомендован к приглашению.</b> Дмитрий закрывает 100% обязательных требований по стеку и имеет подтверждённый опыт запуска высоконагруженных продуктов с нуля — именно то, что требуется для вашей задачи. Единственный нюанс: зарплатные ожидания (5 000 €) в верхней части вилки, но оправданы уровнем.</p>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs-row">
+      <button class="tab-btn active" onclick="switchTab('analysis', this)">📊 Анализ совпадения</button>
+      <button class="tab-btn" onclick="switchTab('experience', this)">💼 Опыт работы</button>
+      <button class="tab-btn" onclick="switchTab('case', this)">🏆 Решение кейса</button>
+    </div>
+
+    <!-- TAB: Analysis -->
+    <div class="tab-pane active" id="tab-analysis">
+
+    <!-- Hard Skills block -->
+    <div class="block-card" style="animation-delay:.05s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Hard Skills</div>
+          <div class="block-weight">35%</div>
+        </div>
+        <div class="block-score high">97%</div>
+      </div>
+
+      <div class="skill-match-row">
+        <div class="smr-icon">✅</div>
+        <div class="smr-name">Python</div>
+        <div class="smr-dir">backend · REST API</div>
+        <div class="smr-pct-badge high">96%</div>
+        <div class="smr-badge match">Совпадение</div>
+      </div>
+      <div class="skill-match-row">
+        <div class="smr-icon">✅</div>
+        <div class="smr-name">PostgreSQL</div>
+        <div class="smr-dir">реляционные БД</div>
+        <div class="smr-pct-badge high">91%</div>
+        <div class="smr-badge match">Совпадение</div>
+      </div>
+      <div class="skill-match-row">
+        <div class="smr-icon">✅</div>
+        <div class="smr-name">FastAPI</div>
+        <div class="smr-dir">web framework</div>
+        <div class="smr-pct-badge high">94%</div>
+        <div class="smr-badge match">Совпадение</div>
+      </div>
+      <div class="skill-match-row">
+        <div class="smr-icon">✅</div>
+        <div class="smr-name">Redis</div>
+        <div class="smr-dir">кэширование</div>
+        <div class="smr-pct-badge high">88%</div>
+        <div class="smr-badge match">Совпадение</div>
+      </div>
+      <div class="skill-match-row">
+        <div class="smr-icon">✅</div>
+        <div class="smr-name">Docker</div>
+        <div class="smr-dir">контейнеризация</div>
+        <div class="smr-pct-badge high">85%</div>
+        <div class="smr-badge match">Совпадение</div>
+      </div>
+      <div class="skill-match-row">
+        <div class="smr-icon">⭐</div>
+        <div class="smr-name">Kubernetes</div>
+        <div class="smr-dir">оркестрация</div>
+        <div class="smr-pct-badge mid">77%</div>
+        <div class="smr-badge bonus">Бонус</div>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Стек <b>полностью совпадает</b> с обязательными требованиями. Kubernetes — дополнительный плюс, не требовался, но пригодится при масштабировании.</p>
+      </div>
+    </div>
+
+    <!-- Experience block -->
+    <div class="block-card" style="animation-delay:.08s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Опыт</div>
+          <div class="block-weight">20%</div>
+        </div>
+        <div class="block-score high">92%</div>
+      </div>
+
+      <div class="tags-wrap" style="margin-bottom:14px">
+        <span class="tag match">✓ 5 лет опыта</span>
+        <span class="tag match">✓ Запуск с нуля</span>
+        <span class="tag match">✓ Backend системы</span>
+        <span class="tag match">✓ Продуктовая компания</span>
+        <span class="tag bonus">⭐ Высокая нагрузка</span>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Кандидат запускал backend-сервисы с нуля в двух продуктовых компаниях. <b>Опыт работы с высокой нагрузкой</b> (100k+ rps) — сверх ваших требований.</p>
+      </div>
+    </div>
+
+    <!-- Soft Skills block -->
+    <div class="block-card" style="animation-delay:.1s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Soft Skills</div>
+          <div class="block-weight">15%</div>
+        </div>
+        <div class="block-score high">88%</div>
+      </div>
+
+      <div class="soft-match-row">
+        <div class="smr-soft-name">Самостоятельность</div>
+        <div class="smr-soft-bars">
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip filled"></div>
+        </div>
+        <span class="smr-soft-delta match">5/5 ✓</span>
+      </div>
+      <div class="soft-match-row">
+        <div class="smr-soft-name">Инициативность</div>
+        <div class="smr-soft-bars">
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip"></div>
+        </div>
+        <span class="smr-soft-delta match">4/5 ✓</span>
+      </div>
+      <div class="soft-match-row">
+        <div class="smr-soft-name">Работа в неопределённости</div>
+        <div class="smr-soft-bars">
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip"></div>
+        </div>
+        <span class="smr-soft-delta close">4/5 ≈</span>
+      </div>
+      <div class="soft-match-row">
+        <div class="smr-soft-name">Коммуникация с командой</div>
+        <div class="smr-soft-bars">
+          <div class="soft-pip filled"></div><div class="soft-pip filled"></div>
+          <div class="soft-pip filled"></div><div class="soft-pip"></div>
+          <div class="soft-pip"></div>
+        </div>
+        <span class="smr-soft-delta match">3/5 ✓</span>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Самостоятельность и инициативность — <b>точное совпадение</b>. Лёгкое расхождение по работе в условиях неопределённости: оценка 4 вместо ожидаемой 5 — <b>некритично</b>.</p>
+      </div>
+    </div>
+
+    <!-- Psychotype block -->
+    <div class="block-card" style="animation-delay:.12s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Психотип</div>
+          <div class="block-weight">10%</div>
+        </div>
+        <div class="block-score high">90%</div>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--success);letter-spacing:.04em;margin-bottom:8px">СОВПАДАЕТ</div>
+        <div class="tags-wrap">
+          <span class="tag match">✓ Технический лидер</span>
+          <span class="tag match">✓ Системное мышление</span>
+          <span class="tag match">✓ Не нуждается в контроле</span>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--success);letter-spacing:.04em;margin-bottom:8px">АНТИПАТТЕРНЫ — ЧИСТО</div>
+        <div class="tags-wrap">
+          <span class="tag match">✓ Не избегает ответственности</span>
+          <span class="tag match">✓ Самостоятелен</span>
+        </div>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Профиль кандидата <b>не содержит ни одного антипаттерна</b> из вашего списка. Тип личности — технический лидер с высокой автономией.</p>
+      </div>
+    </div>
+
+    <!-- Conditions block -->
+    <div class="block-card" style="animation-delay:.14s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Условия</div>
+          <div class="block-weight">15%</div>
+        </div>
+        <div class="block-score high">95%</div>
+      </div>
+
+      <div class="tags-wrap" style="margin-bottom:14px">
+        <span class="tag match">✓ Remote</span>
+        <span class="tag match">✓ 5 000 € — в вилке</span>
+        <span class="tag match">✓ Готов сразу</span>
+        <span class="tag bonus">⭐ Гибкий график</span>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Зарплатные ожидания <b>5 000 €</b> — в верхней части вашей вилки (4 000–6 000 €). Готов выйти через 2 недели. Условия совместимы полностью.</p>
+      </div>
+    </div>
+
+    <!-- Context block -->
+    <div class="block-card" style="animation-delay:.16s">
+      <div class="block-header">
+        <div class="block-title-wrap">
+          <div class="block-title">Контекст и культура</div>
+          <div class="block-weight">5%</div>
+        </div>
+        <div class="block-score mid">85%</div>
+      </div>
+
+      <div class="tags-wrap" style="margin-bottom:14px">
+        <span class="tag match">✓ Работал в командах 3–6 человек</span>
+        <span class="tag match">✓ Быстрые итерации</span>
+        <span class="tag neutral">≈ Привык к более формальным процессам</span>
+      </div>
+
+      <div class="ai-comment">
+        <div class="ai-comment-icon">✦</div>
+        <p>Небольшое расхождение в культуре: кандидат привык к <b>чуть более структурированным процессам</b>, чем у вас. Адаптация займёт 1–2 недели — <b>не критично</b>.</p>
+      </div>
+    </div>
+
+    </div><!-- /tab-analysis -->
+
+    <!-- TAB: Experience -->
+    <div class="tab-pane" id="tab-experience">
+
+      <div class="exp-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+          <div>
+            <div style="font-size:15px;font-weight:800;letter-spacing:-.3px">Опыт работы</div>
+            <div style="font-size:12px;color:var(--text-muted);font-weight:500;margin-top:2px">Из профиля кандидата · 3 места работы · 5 лет</div>
+          </div>
+        </div>
+        <div class="exp-list">
+
+          <div class="exp-item">
+            <div class="exp-item-top">
+              <div class="exp-company">Fintech Startup (PayFlow)</div>
+              <div class="exp-period">Янв 2022 — наст. время · 2 года</div>
+            </div>
+            <div class="exp-role-line">Senior Backend Developer</div>
+            <div class="exp-desc">Разработал с нуля платёжный API на FastAPI + PostgreSQL, обрабатывающий 50k rps. Внедрил систему очередей на Redis, снизил latency с 400ms до 80ms. Руководил командой из 3 backend-разработчиков при запуске продукта.</div>
+            <div class="exp-tags">
+              <span class="exp-tag">FastAPI</span>
+              <span class="exp-tag">PostgreSQL</span>
+              <span class="exp-tag">Redis</span>
+              <span class="exp-tag">Docker</span>
+              <span class="exp-tag">Kubernetes</span>
+            </div>
+            <div class="exp-relevance high">✓ Высокая релевантность</div>
+          </div>
+
+          <div class="exp-item">
+            <div class="exp-item-top">
+              <div class="exp-company">E-commerce Platform (Marketo)</div>
+              <div class="exp-period">Март 2020 — Дек 2021 · 1 год 9 мес</div>
+            </div>
+            <div class="exp-role-line">Backend Developer</div>
+            <div class="exp-desc">Разрабатывал модули каталога товаров и корзины для маркетплейса с 500k+ активными пользователями. Оптимизировал SQL-запросы — ускорение выборок в 3x. Мигрировал монолит на микросервисную архитектуру.</div>
+            <div class="exp-tags">
+              <span class="exp-tag">Python</span>
+              <span class="exp-tag">Django</span>
+              <span class="exp-tag">PostgreSQL</span>
+              <span class="exp-tag">Microservices</span>
+            </div>
+            <div class="exp-relevance high">✓ Высокая релевантность</div>
+          </div>
+
+          <div class="exp-item">
+            <div class="exp-item-top">
+              <div class="exp-company">Digital Agency (WebCraft)</div>
+              <div class="exp-period">Июнь 2018 — Февр 2020 · 1 год 8 мес</div>
+            </div>
+            <div class="exp-role-line">Junior Python Developer</div>
+            <div class="exp-desc">Поддержка и разработка клиентских сайтов на Django. Написал автоматизацию отчётности, сократившую ручную работу команды на 4 часа в неделю.</div>
+            <div class="exp-tags">
+              <span class="exp-tag">Python</span>
+              <span class="exp-tag">Django</span>
+              <span class="exp-tag">MySQL</span>
+            </div>
+            <div class="exp-relevance mid">≈ Частичная релевантность</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /tab-experience -->
+
+    <!-- TAB: Case solution -->
+    <div class="tab-pane" id="tab-case">
+
+      <!-- State: candidate HAS solved the case (verif level 1 or 2) -->
+      <div id="case-solved-state">
+
+        <div class="case-card">
+          <!-- Header: rank -->
+          <div class="case-header">
+            <div>
+              <div style="font-size:15px;font-weight:800;letter-spacing:-.3px;margin-bottom:4px">Решение публичного кейса</div>
+              <div style="font-size:12px;color:var(--text-muted);font-weight:500">Отправлено 15 марта 2026 · Оценено ИИ-платформой</div>
+            </div>
+            <div class="case-rank-big">
+              <div class="case-rank-num">2</div>
+              <div class="case-rank-sub">из 14 решений</div>
+              <div class="case-rank-badge top">⭐ Решил кейс компании</div>
+            </div>
+          </div>
+
+          <!-- Score breakdown -->
+          <div class="case-section-label">Оценка ИИ</div>
+          <div class="case-score-row">
+            <div class="case-score-item high">
+              <div class="case-score-item-num">94</div>
+              <div class="case-score-item-lbl">Техническая глубина</div>
+            </div>
+            <div class="case-score-item high">
+              <div class="case-score-item-num">91</div>
+              <div class="case-score-item-lbl">Практичность</div>
+            </div>
+            <div class="case-score-item mid">
+              <div class="case-score-item-num">78</div>
+              <div class="case-score-item-lbl">Документация</div>
+            </div>
+            <div class="case-score-item high">
+              <div class="case-score-item-num">88</div>
+              <div class="case-score-item-lbl">Итого</div>
+            </div>
+          </div>
+
+          <!-- AI comment -->
+          <div class="ai-comment" style="margin-bottom:18px">
+            <div class="ai-comment-icon">✦</div>
+            <p>Кандидат предложил <b>горизонтальное шардирование</b> с Redis Cluster и async-воркерами — решение закрывает проблему таймаутов при 10k rps с запасом до 50k. <b>Документация неполная</b> — нет описания fallback-стратегии. В сравнении с другими 13 решениями это <b>второй результат</b>.</p>
+          </div>
+
+          <!-- Task -->
+          <div class="case-section-label">Задание компании</div>
+          <div class="case-task-box">У нас есть API для обработки платежей, но при нагрузке 10k rps начинаются таймауты. Предложите решение и опишите архитектуру. Срок: 3 дня. Формат: техническое описание.</div>
+
+          <!-- Solution -->
+          <div class="case-section-label">Решение кандидата</div>
+          <div class="case-solution-box">Предлагаю перейти на горизонтальное шардирование с Redis Cluster (3 мастер-ноды + репликация). Для обработки пиков — async-воркеры на Celery с RabbitMQ. API Gateway добавляет rate limiting на уровне 15k rps. PostgreSQL — партиционирование по дате транзакции. Ожидаемый результат: latency P99 &lt; 100ms при 50k rps.</div>
+          <a href="#" class="case-solution-link" onclick="showToast('Открываем репозиторий...');return false">
+            📁 Репозиторий с решением
+          </a>
+
+        </div>
+      </div>
+
+      <!-- State: candidate has NOT solved the case -->
+      <div id="case-empty-state" style="display:none">
+        <div class="case-card">
+          <div class="case-no-solution">
+            <div class="case-no-solution-icon">📋</div>
+            <h3>Кандидат ещё не решал кейс</h3>
+            <p>Этот кандидат не решал публичный кейс по вашей вакансии.<br>Вы можете отправить ему персональное задание.</p>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /tab-case -->
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- Action card -->
+    <div class="action-card">
+      <h3 id="action-title">Что дальше?</h3>
+      <p id="action-sub">Это топ-кандидат — 94% совпадение. Рекомендуем пригласить к диалогу.</p>
+      <button class="btn-main-action" id="btn-invite" onclick="inviteCandidate()">💬 Пригласить к диалогу</button>
+      <button class="btn-undo" id="undo-invite" onclick="undoInvite()">↩ Отменить приглашение</button>
+      <button class="btn-secondary-action" id="btn-contact" onclick="requestContact()">📋 Запросить контакт</button>
+      <button class="btn-undo" id="undo-contact" onclick="undoContact()">↩ Отменить запрос</button>
+      <button class="btn-task" id="btn-task" onclick="openTaskModal()">📝 Предложить тестовое</button>
+      <button class="btn-video" onclick="openVideoModal()"><span class="video-dot"></span> Посмотреть запись интервью</button>
+      <button class="btn-decline-action" id="btn-decline" onclick="openDeclineModal()">✕ Не подходит</button>
+    </div>
+
+    <!-- Nav arrows -->
+    <div class="nav-arrows">
+      <p>Навигация по кандидатам</p>
+      <div class="nav-arrow-btns">
+        <button class="btn-arrow" onclick="prevCandidate()">← Предыдущий</button>
+        <button class="btn-arrow" onclick="nextCandidate()">Следующий →</button>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    <div class="summary-card">
+      <h4>Кратко</h4>
+      <div class="summary-row">
+        <span class="summary-key">Опыт</span>
+        <span class="summary-val">5 лет</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Зарплата</span>
+        <span class="summary-val">5 000 €</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Формат</span>
+        <span class="summary-val">Remote</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Готов выйти</span>
+        <span class="summary-val">Через 2 недели</span>
+      </div>
+      <div class="summary-row">
+        <span class="summary-key">Совпадение</span>
+        <span class="summary-val" style="color:var(--success)">94% — топ</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TASK MODAL -->
+<div class="modal-overlay" id="task-modal" onclick="if(event.target===this)closeTaskModal()">
+  <div class="modal-box">
+    <div class="modal-title">Тестовое задание</div>
+    <div class="modal-sub">Выберите шаблон или напишите своё задание</div>
+    <div class="task-modal-body">
+      <div class="task-option" onclick="selectTask(this, 'Разработать REST API эндпоинт для авторизации с JWT токенами. Срок: 3 дня.')">
+        <div class="task-option-name">REST API эндпоинт</div>
+        <div class="task-option-desc">Авторизация с JWT · 3 дня</div>
+      </div>
+      <div class="task-option" onclick="selectTask(this, 'Оптимизировать медленный SQL-запрос: уменьшить время выполнения с 3с до < 200ms. Срок: 2 дня.')">
+        <div class="task-option-name">Оптимизация SQL-запроса</div>
+        <div class="task-option-desc">Производительность БД · 2 дня</div>
+      </div>
+      <div class="task-option" onclick="selectTask(this, 'Спроектировать и реализовать микросервис для обработки очереди задач. Срок: 5 дней.')">
+        <div class="task-option-name">Микросервис для очереди задач</div>
+        <div class="task-option-desc">Архитектура · 5 дней</div>
+      </div>
+      <div class="task-option" onclick="selectTask(this, '')">
+        <div class="task-option-name">✎ Своё задание</div>
+        <div class="task-option-desc">Написать самостоятельно</div>
+      </div>
+    </div>
+    <textarea class="task-textarea" id="task-text" placeholder="Текст задания появится здесь — можно отредактировать перед отправкой..."></textarea>
+    <button class="btn-task-send" onclick="sendTask()">📝 Отправить задание</button>
+    <button class="btn-modal-close" onclick="closeTaskModal()">Отмена</button>
+  </div>
+</div>
+
+<!-- DECLINE MODAL -->
+<div class="modal-overlay" id="decline-modal" onclick="if(event.target===this)closeDeclineModal()">
+  <div class="modal-box">
+    <div class="modal-title">Причина отказа</div>
+    <div class="modal-sub">Необязательно — но помогает улучшить следующие результаты поиска</div>
+    <div class="decline-options">
+      <button class="decline-opt" onclick="selectDecline(this)">Не подходит по навыкам</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Недостаточно опыта</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Не подходит по зарплате</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Не вписывается в команду</button>
+      <button class="decline-opt" onclick="selectDecline(this)">Другая причина</button>
+    </div>
+    <button class="btn-decline-confirm" onclick="confirmDecline()">Подтвердить</button>
+    <button class="btn-modal-close" onclick="closeDeclineModal()">Пропустить</button>
+  </div>
+</div>
+
+<script>
+
+// ── TABS ──
+// Candidate verif level for this demo: 1 = solved case, 2 = verified, 3 = basic
+const CAND_VERIF = 1;
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  // Show correct case state
+  if (tab === 'case') {
+    const hasSolved = CAND_VERIF === 1;
+    document.getElementById('case-solved-state').style.display = hasSolved ? 'block' : 'none';
+    document.getElementById('case-empty-state').style.display = hasSolved ? 'none' : 'block';
+  }
+}
+
+function initVerifBadge() {
+  const badge = document.getElementById('cand-verif-badge');
+  if (!badge) return;
+  if (CAND_VERIF === 1) {
+    badge.textContent = '⭐ Решил кейс компании';
+    badge.style.background = '#FEF3C7'; badge.style.color = '#92400E'; badge.style.borderColor = '#FDE68A';
+  } else if (CAND_VERIF === 2) {
+    badge.textContent = '✓ Верифицирован';
+    badge.style.background = 'var(--success-bg)'; badge.style.color = 'var(--success)'; badge.style.borderColor = '#6EE7B7';
+  } else {
+    badge.textContent = '◦ Базовая верификация';
+    badge.style.background = 'var(--bg)'; badge.style.color = 'var(--text-secondary)'; badge.style.borderColor = 'var(--border)';
+  }
+}
+
+
+// ── MATCH BARS ──
+const scores = [
+  { name: 'Hard Skills', weight: '35%', val: 97 },
+  { name: 'Опыт', weight: '20%', val: 92 },
+  { name: 'Soft Skills', weight: '15%', val: 88 },
+  { name: 'Условия', weight: '15%', val: 95 },
+  { name: 'Психотип', weight: '10%', val: 90 },
+  { name: 'Контекст', weight: '5%', val: 85 },
+];
+
+function getBarClass(v) { return v >= 80 ? 'green' : v >= 65 ? 'yellow' : 'red'; }
+function getPctColor(v) { return v >= 80 ? 'var(--success)' : v >= 65 ? 'var(--warning)' : 'var(--error)'; }
+
+initVerifBadge();
+document.getElementById('ob-bars').innerHTML = scores.map(s => `
+  <div class="ob-row">
+    <div class="ob-name">${s.name}</div>
+    <div class="ob-bar-wrap">
+      <div class="ob-bar ${getBarClass(s.val)}" style="width:${s.val}%"></div>
+    </div>
+    <div class="ob-pct" style="color:${getPctColor(s.val)}">${s.val}%</div>
+
+  </div>
+`).join('');
+
+// ── ACTIONS ──
+let status = null; // null | 'invited' | 'contact' | 'task' | 'declined'
+
+function inviteCandidate() {
+  if (status === 'declined') return;
+  status = 'invited';
+  const btn = document.getElementById('btn-invite');
+  btn.textContent = '✓ Приглашён к диалогу';
+  btn.classList.add('done');
+  document.getElementById('undo-invite').classList.add('show');
+  document.getElementById('btn-contact').style.opacity = '.4';
+  document.getElementById('btn-contact').style.pointerEvents = 'none';
+  document.getElementById('action-title').textContent = 'Приглашение отправлено';
+  document.getElementById('action-sub').textContent = 'Кандидат получит уведомление и сможет ответить на платформе.';
+  showToast('Приглашение отправлено');
+}
+
+function undoInvite() {
+  status = null;
+  const btn = document.getElementById('btn-invite');
+  btn.textContent = '💬 Пригласить к диалогу';
+  btn.classList.remove('done');
+  document.getElementById('undo-invite').classList.remove('show');
+  document.getElementById('btn-contact').style.opacity = '';
+  document.getElementById('btn-contact').style.pointerEvents = '';
+  document.getElementById('action-title').textContent = 'Что дальше?';
+  document.getElementById('action-sub').textContent = 'Это топ-кандидат — 94% совпадение. Рекомендуем пригласить к диалогу.';
+  showToast('Приглашение отменено');
+}
+
+function requestContact() {
+  if (status === 'declined') return;
+  status = 'contact';
+  const btn = document.getElementById('btn-contact');
+  btn.textContent = '✓ Контакт запрошен';
+  btn.style.color = 'var(--purple)';
+  btn.style.borderColor = 'var(--purple-mid)';
+  btn.style.background = 'var(--purple-soft)';
+  document.getElementById('undo-contact').classList.add('show');
+  document.getElementById('btn-invite').style.opacity = '.4';
+  document.getElementById('btn-invite').style.pointerEvents = 'none';
+  document.getElementById('undo-invite').classList.remove('show');
+  document.getElementById('action-sub').textContent = 'Кандидат получит запрос и решит, передавать ли контакты.';
+  showToast('Запрос контакта отправлен');
+}
+
+function undoContact() {
+  status = null;
+  const btn = document.getElementById('btn-contact');
+  btn.textContent = '📋 Запросить контакт';
+  btn.style.color = '';
+  btn.style.borderColor = '';
+  btn.style.background = '';
+  document.getElementById('undo-contact').classList.remove('show');
+  document.getElementById('btn-invite').style.opacity = '';
+  document.getElementById('btn-invite').style.pointerEvents = '';
+  document.getElementById('action-title').textContent = 'Что дальше?';
+  document.getElementById('action-sub').textContent = 'Это топ-кандидат — 94% совпадение. Рекомендуем пригласить к диалогу.';
+  showToast('Запрос отменён');
+}
+
+// Task modal
+let selectedTaskText = '';
+
+function openVideoModal() {
+  document.getElementById('video-modal').classList.add('show');
+}
+function closeVideoModal() {
+  document.getElementById('video-modal').classList.remove('show');
+}
+
+function openTaskModal() { document.getElementById('task-modal').classList.add('show'); }
+function closeTaskModal() { document.getElementById('task-modal').classList.remove('show'); }
+function selectTask(el, text) {
+  document.querySelectorAll('.task-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('task-text').value = text;
+  if (!text) document.getElementById('task-text').focus();
+}
+function sendTask() {
+  const text = document.getElementById('task-text').value.trim();
+  if (!text) { document.getElementById('task-text').focus(); return; }
+  closeTaskModal();
+  const btn = document.getElementById('btn-task');
+  btn.textContent = '✓ Тестовое отправлено';
+  btn.classList.add('sent');
+  showToast('Тестовое задание отправлено');
+}
+
+function openDeclineModal() {
+  document.getElementById('decline-modal').classList.add('show');
+}
+function closeDeclineModal() {
+  document.getElementById('decline-modal').classList.remove('show');
+}
+function selectDecline(btn) {
+  document.querySelectorAll('.decline-opt').forEach(o => o.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+function confirmDecline() {
+  status = 'declined';
+  closeDeclineModal();
+  // Disable all action buttons
+  ['btn-invite','btn-contact','btn-task'].forEach(id => {
+    const el = document.getElementById(id);
+    el.disabled = true; el.style.opacity = '.4'; el.style.pointerEvents = 'none';
+  });
+  ['undo-invite','undo-contact'].forEach(id => document.getElementById(id).classList.remove('show'));
+  document.getElementById('btn-decline').textContent = '✕ Отклонён';
+  document.getElementById('btn-decline').style.color = 'var(--error)';
+  document.getElementById('btn-decline').style.borderColor = 'var(--error)';
+  document.getElementById('btn-decline').style.background = 'var(--error-bg)';
+  document.getElementById('btn-decline').disabled = true;
+  document.getElementById('action-title').textContent = 'Кандидат отклонён';
+  document.getElementById('action-sub').textContent = 'Это улучшит точность следующих результатов поиска.';
+  showToast('Кандидат отклонён');
+}
+
+// ── NAVIGATION ──
+function prevCandidate() { window.location.href = 'yoffer-candidate.html'; }
+function nextCandidate() { window.location.href = 'yoffer-candidate.html'; }
+
+// ── TOAST ──
+function showToast(text) {
+  const t = document.createElement('div');
+  t.style.cssText = 'position:fixed;bottom:32px;left:50%;transform:translateX(-50%);background:#1A1A2E;color:#fff;padding:10px 22px;border-radius:100px;font-size:13px;font-weight:600;font-family:Manrope,sans-serif;z-index:9999;white-space:nowrap';
+  t.textContent = text;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 2200);
+}
+</script>
+
+<!-- VIDEO MODAL -->
+<div class="modal-overlay" id="video-modal" onclick="if(event.target===this)closeVideoModal()">
+  <div class="modal-box" style="max-width:560px">
+    <div class="modal-title" style="margin-bottom:4px">Запись интервью с ИИ</div>
+    <div class="modal-sub" style="margin-bottom:16px">Дмитрий К. · Python Backend Developer · 18 марта 2026</div>
+
+    <!-- Video player placeholder -->
+    <div class="video-modal-inner">
+      <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1a2e 0%,#2d1b69 100%)"></div>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;z-index:1">
+        <div style="font-size:48px;margin-bottom:8px">🎥</div>
+        <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6)">Видеозапись доступна</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px">Воспроизведение через сервис оценки кандидатов</div>
+      </div>
+      <div class="video-play-btn" style="position:absolute;z-index:2" onclick="showToast('Открываем плеер...')">
+        <div class="video-play-icon">▶</div>
+      </div>
+    </div>
+
+    <!-- Meta -->
+    <div class="video-meta">
+      <div class="video-meta-info">
+        <p>ИИ-интервью по вакансии Python Backend Dev</p>
+        <span>Проведено 18 марта 2026 · Платформа Yoffer Candidates</span>
+      </div>
+      <div class="video-duration">24:37</div>
+    </div>
+
+    <!-- Chapters -->
+    <div style="font-size:11px;font-weight:700;color:var(--text-muted);letter-spacing:.05em;text-transform:uppercase;margin-bottom:8px">Разделы интервью</div>
+    <div class="video-chapters">
+      <div class="video-chapter" onclick="showToast('Перемотка на 0:00')">
+        <div class="video-chapter-time">0:00</div>
+        <div class="video-chapter-label">Знакомство и опыт работы</div>
+        <div class="video-chapter-score good">Уверенно</div>
+      </div>
+      <div class="video-chapter" onclick="showToast('Перемотка на 6:20')">
+        <div class="video-chapter-time">6:20</div>
+        <div class="video-chapter-label">Технические вопросы по стеку</div>
+        <div class="video-chapter-score good">Сильно</div>
+      </div>
+      <div class="video-chapter" onclick="showToast('Перемотка на 13:45')">
+        <div class="video-chapter-time">13:45</div>
+        <div class="video-chapter-label">Работа в команде и процессы</div>
+        <div class="video-chapter-score ok">Хорошо</div>
+      </div>
+      <div class="video-chapter" onclick="showToast('Перемотка на 19:10')">
+        <div class="video-chapter-time">19:10</div>
+        <div class="video-chapter-label">Мотивация и ожидания</div>
+        <div class="video-chapter-score good">Уверенно</div>
+      </div>
+    </div>
+
+    <button class="btn-modal-close" onclick="closeVideoModal()">Закрыть</button>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Интервью с ИИ</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+    --success: #10B981;
+    --success-bg: #ECFDF5;
+  }
+  html, body { height: 100%; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); display: flex; flex-direction: column; overflow: hidden; }
+
+  /* NAV */
+  nav {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 50;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-center { display: flex; align-items: center; gap: 8px; }
+  .nav-vacancy { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .nav-sep { color: var(--text-muted); }
+  .nav-mode { font-size: 13px; font-weight: 600; color: var(--purple); background: var(--purple-soft); padding: 4px 12px; border-radius: 100px; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-save { padding: 8px 18px; border-radius: 10px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; color: var(--text-secondary); background: transparent; border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-save:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* PROGRESS BAR */
+  .progress-wrap {
+    background: var(--white); border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 56px; flex-shrink: 0;
+    display: flex; align-items: center; gap: 0;
+  }
+  .step { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); padding: 0 4px; }
+  .step.active { color: var(--purple); }
+  .step.done { color: var(--success); }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; background: var(--bg); border: 2px solid var(--border); color: var(--text-muted); flex-shrink: 0; }
+  .step.active .step-num { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .step.done .step-num { background: var(--success); border-color: var(--success); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); margin: 0 8px; min-width: 32px; }
+  .step-line.done { background: var(--success); }
+
+  /* MAIN LAYOUT */
+  .main { flex: 1; display: grid; grid-template-columns: 1fr 320px; min-height: 0; }
+
+  /* CHAT AREA */
+  .chat-area { display: flex; flex-direction: column; min-height: 0; border-right: 1px solid var(--border); }
+
+  /* Round tabs */
+  .round-tabs { padding: 12px 24px; border-bottom: 1px solid var(--border); display: flex; gap: 6px; background: var(--white); flex-shrink: 0; }
+  .round-tab { padding: 5px 14px; border-radius: 100px; font-size: 12px; font-weight: 700; border: 1.5px solid var(--border); background: var(--white); color: var(--text-muted); cursor: default; transition: all .3s; }
+  .round-tab.active { border-color: var(--purple); background: var(--purple-soft); color: var(--purple); }
+  .round-tab.done { border-color: var(--success); background: var(--success-bg); color: var(--success); }
+
+  /* Messages */
+  .messages { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-track { background: transparent; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .msg-ai { display: flex; gap: 10px; align-items: flex-start; animation: msgIn .3s ease both; }
+  .msg-user { display: flex; justify-content: flex-end; animation: msgIn .3s ease both; }
+  @keyframes msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  .ai-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; margin-top: 2px; }
+  .ai-bubble { background: var(--white); border: 1.5px solid var(--border); border-radius: 4px 16px 16px 16px; padding: 13px 17px; font-size: 14px; line-height: 1.7; font-weight: 500; max-width: 82%; color: var(--text-primary); }
+  .user-bubble { background: var(--purple); border-radius: 16px 4px 16px 16px; padding: 13px 17px; font-size: 14px; line-height: 1.65; font-weight: 500; max-width: 78%; color: #fff; }
+
+  /* Typing indicator */
+  .typing { display: flex; gap: 10px; align-items: center; }
+  .typing-dots { display: flex; gap: 4px; padding: 13px 17px; background: var(--white); border: 1.5px solid var(--border); border-radius: 4px 16px 16px 16px; }
+  .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--text-muted); animation: blink 1.2s ease-in-out infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: .2s; }
+  .typing-dots span:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,80%,100%{opacity:.25} 40%{opacity:1} }
+
+  /* Quick replies */
+  .quick-replies { padding: 12px 24px 0; display: flex; flex-wrap: wrap; gap: 7px; flex-shrink: 0; }
+  .qr-btn { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 600; font-family: 'Manrope',sans-serif; border: 1.5px solid var(--border); background: var(--white); color: var(--text-primary); cursor: pointer; transition: all .18s; max-width: 100%; text-align: left; }
+  .qr-btn:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-soft); }
+
+  /* Input area */
+  .input-area { padding: 14px 24px 20px; background: var(--white); border-top: 1px solid var(--border); flex-shrink: 0; }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+  textarea {
+    flex: 1; resize: none; padding: 12px 16px; border-radius: 14px;
+    border: 1.5px solid var(--border); font-size: 14px;
+    font-family: 'Manrope',sans-serif; font-weight: 500;
+    color: var(--text-primary); background: var(--bg);
+    outline: none; transition: border-color .2s, box-shadow .2s;
+    line-height: 1.6; max-height: 120px; min-height: 48px;
+  }
+  textarea:focus { border-color: var(--purple); background: var(--white); box-shadow: 0 0 0 4px rgba(107,78,255,.08); }
+  textarea::placeholder { color: var(--text-muted); }
+  .btn-send {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    background: var(--purple); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s; color: #fff; font-size: 18px;
+  }
+  .btn-send:hover { background: var(--purple-light); transform: scale(1.05); }
+  .btn-send:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+  .input-hint { font-size: 11px; color: var(--text-muted); font-weight: 500; margin-top: 7px; }
+
+  /* API KEY SETUP */
+  .api-setup {
+    background: var(--white); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 16px 18px; margin: 0 24px 0;
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .api-setup-icon { font-size: 20px; flex-shrink: 0; }
+  .api-setup-text { flex: 1; }
+  .api-setup-text p { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+  .api-setup-text span { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+  .api-input-row { display: flex; gap: 8px; margin-top: 8px; }
+  .api-key-input { flex: 1; padding: 8px 12px; border-radius: 9px; border: 1.5px solid var(--border); font-size: 13px; font-family: 'Manrope',sans-serif; outline: none; transition: border-color .2s; }
+  .api-key-input:focus { border-color: var(--purple); }
+  .btn-api-connect { padding: 8px 16px; border-radius: 9px; font-size: 13px; font-weight: 700; font-family: 'Manrope',sans-serif; background: var(--purple); color: #fff; border: none; cursor: pointer; transition: all .2s; white-space: nowrap; }
+  .btn-api-connect:hover { background: var(--purple-light); }
+
+  /* PROFILE PANEL */
+  .profile-panel { display: flex; flex-direction: column; min-height: 0; background: var(--white); }
+  .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .panel-title { font-size: 13px; font-weight: 700; color: var(--text-secondary); letter-spacing: .05em; text-transform: uppercase; margin-bottom: 10px; }
+  .completeness-row { display: flex; align-items: center; gap: 10px; }
+  .completeness-bar-wrap { flex: 1; height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .completeness-bar { height: 100%; background: var(--purple); border-radius: 3px; transition: width .5s ease; }
+  .completeness-pct { font-size: 13px; font-weight: 800; color: var(--purple); }
+
+  .panel-blocks { flex: 1; overflow-y: auto; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+  .panel-blocks::-webkit-scrollbar { width: 3px; }
+  .panel-blocks::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .profile-block { border: 1.5px solid var(--border); border-radius: 14px; padding: 13px 15px; transition: border-color .3s; }
+  .profile-block.filled { border-color: var(--purple-mid); }
+  .pb-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .pb-title { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: .04em; text-transform: uppercase; }
+  .pb-weight { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+  .pb-content { min-height: 28px; }
+  .pb-empty { font-size: 12px; color: var(--text-muted); font-weight: 500; font-style: italic; }
+  .pb-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .pb-tag { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 100px; background: var(--purple-soft); color: var(--purple); }
+  .pb-tag.soft { background: var(--success-bg); color: var(--success); }
+  .pb-tag.neutral { background: var(--bg); color: var(--text-secondary); }
+
+  .panel-footer { padding: 14px 20px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .btn-finish {
+    width: 100%; padding: 13px; border-radius: 12px; font-size: 14px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 4px 16px rgba(107,78,255,.25); opacity: .4; pointer-events: none;
+  }
+  .btn-finish.ready { opacity: 1; pointer-events: all; }
+  .btn-finish.ready:hover { background: var(--purple-light); transform: translateY(-1px); }
+
+  @media(max-width:900px){
+    nav{padding:0 20px} .progress-wrap{padding:0 20px}
+    .main{grid-template-columns:1fr}
+    .profile-panel{display:none}
+    body{overflow:auto}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="yoffer-dashboard.html" class="nav-logo">YOFFER</a>
+  <div class="nav-center">
+    <span class="nav-vacancy" id="nav-vacancy">Новая вакансия</span>
+    <span class="nav-sep">·</span>
+    <span class="nav-mode" id="nav-mode">Описать задачу</span>
+  </div>
+  <div class="nav-right">
+    <button class="btn-save" onclick="saveDraft()">Сохранить черновик</button>
+  </div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="step done"><div class="step-num">✓</div><span>Брифинг</span></div>
+  <div class="step-line done"></div>
+  <div class="step done"><div class="step-num">✓</div><span>Режим</span></div>
+  <div class="step-line done"></div>
+  <div class="step active"><div class="step-num">3</div><span>Интервью с ИИ</span></div>
+  <div class="step-line"></div>
+  <div class="step"><div class="step-num">4</div><span>Профиль готов</span></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- CHAT -->
+  <div class="chat-area">
+
+    <!-- Round tabs -->
+    <div class="round-tabs">
+      <div class="round-tab active" id="tab-1">💼 Роль и контекст</div>
+      <div class="round-tab" id="tab-2">⚙️ Навыки</div>
+      <div class="round-tab" id="tab-3">🧠 Личность</div>
+      <div class="round-tab" id="tab-4">💰 Условия</div>
+    </div>
+
+    <!-- API key setup (shown until key entered) -->
+    <div class="api-setup" id="api-setup">
+      <div class="api-setup-icon">🔑</div>
+      <div class="api-setup-text">
+        <p>Подключите Claude API для живого диалога</p>
+        <span>Ключ: <a href="https://console.anthropic.com/settings/keys" target="_blank" style="color:var(--purple);font-weight:600">console.anthropic.com</a> → API Keys</span>
+        <div class="api-input-row">
+          <input class="api-key-input" id="api-key-input" type="password" placeholder="Вставьте ваш Claude API ключ (sk-ant-...)..." />
+          <button class="btn-api-connect" onclick="connectApi()">Подключить</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div class="messages" id="messages"></div>
+
+    <!-- Quick replies -->
+    <div class="quick-replies" id="quick-replies"></div>
+
+    <!-- Input -->
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="user-input" placeholder="Напишите ответ или выберите вариант выше..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMessage()}"
+          oninput="autoResize(this)"></textarea>
+        <button class="btn-send" id="btn-send" onclick="sendMessage()" disabled>↑</button>
+      </div>
+      <div class="input-hint">Enter — отправить · Shift+Enter — новая строка</div>
+    </div>
+  </div>
+
+  <!-- PROFILE PANEL -->
+  <div class="profile-panel">
+    <div class="panel-header">
+      <div class="panel-title">Профиль кандидата</div>
+      <div class="completeness-row">
+        <div class="completeness-bar-wrap">
+          <div class="completeness-bar" id="completeness-bar" style="width:0%"></div>
+        </div>
+        <div class="completeness-pct" id="completeness-pct">0%</div>
+      </div>
+    </div>
+
+    <div class="panel-blocks">
+      <div class="profile-block" id="block-skills">
+        <div class="pb-header">
+          <div class="pb-title">Hard Skills</div>
+          <div class="pb-weight">35%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="skills-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="skills-tags"></div>
+        </div>
+      </div>
+
+      <div class="profile-block" id="block-exp">
+        <div class="pb-header">
+          <div class="pb-title">Опыт</div>
+          <div class="pb-weight">20%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="exp-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="exp-tags"></div>
+        </div>
+      </div>
+
+      <div class="profile-block" id="block-soft">
+        <div class="pb-header">
+          <div class="pb-title">Soft Skills</div>
+          <div class="pb-weight">15%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="soft-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="soft-tags"></div>
+        </div>
+      </div>
+
+      <div class="profile-block" id="block-cond">
+        <div class="pb-header">
+          <div class="pb-title">Условия</div>
+          <div class="pb-weight">15%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="cond-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="cond-tags"></div>
+        </div>
+      </div>
+
+      <div class="profile-block" id="block-psych">
+        <div class="pb-header">
+          <div class="pb-title">Психотип</div>
+          <div class="pb-weight">10%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="psych-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="psych-tags"></div>
+        </div>
+      </div>
+
+      <div class="profile-block" id="block-ctx">
+        <div class="pb-header">
+          <div class="pb-title">Контекст</div>
+          <div class="pb-weight">5%</div>
+        </div>
+        <div class="pb-content">
+          <div class="pb-empty" id="ctx-empty">Ещё не заполнено</div>
+          <div class="pb-tags" id="ctx-tags"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-footer">
+      <button class="btn-finish" id="btn-finish" onclick="goToProfile()">
+        Профиль готов → просмотреть
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──
+let apiKey = '';  // Claude API key — вставьте ваш ключ
+let conversationHistory = [];
+let profileData = { skills: [], exp: [], soft: [], cond: [], psych: [], ctx: [], role_name: '' };
+let currentRound = 1;
+let isWaiting = false;
+let messageCount = 0;
+
+// Briefing data (passed from previous page — hardcoded for demo)
+const briefing = {
+  role: '', // will be determined during interview
+  goal: 'Запустить новый продукт',
+  urgency: 'Планово (~3 месяца)',
+  userRole: 'Руководитель отдела',
+  mode: 'task' // 'task' or 'criteria'
+};
+
+// ── SYSTEM PROMPT ──
+function getSystemPrompt() {
+  return `Ты — ИИ-ассистент платформы YOFFER для работодателей. Твоя задача — провести структурированное интервью с ${briefing.userRole} для создания точного профиля кандидата на роль "${briefing.role}".
+
+Контекст вакансии:
+- Роль: ${briefing.role}
+- Цель найма: ${briefing.goal}
+- Срочность: ${briefing.urgency}
+- Режим: ${briefing.mode === 'task' ? 'Описание задачи (свободный диалог)' : 'По критериям (структурированный опрос)'}
+
+Веди диалог на русском языке. Задавай по ОДНОМУ вопросу за раз — не перегружай пользователя.
+
+Структура интервью (4 раунда):
+1. Роль и контекст (~3 вопроса): команда, задача, что не работает сейчас
+2. Навыки (~4-5 вопросов): обязательный стек, что можно обучить, неоднозначные навыки — уточняй направление (например Python для backend/data/ML)
+3. Личность и культура (~3-4 вопроса): психотип, антипаттерн, стиль работы
+4. Условия (~2-3 вопроса): зарплата, формат, геолокация
+
+${briefing.mode === 'task' ? 'Режим "задача": начни с открытого вопроса о ситуации/задаче, а не о требованиях к кандидату.' : 'Режим "критерии": веди структурированный опрос по блокам последовательно.'}
+
+В конце каждого ответа пользователя — в отдельной строке добавь JSON с извлечёнными данными для профиля в формате:
+[PROFILE_UPDATE:{"skills":[],"exp":[],"soft":[],"cond":[],"psych":[],"ctx":[]}]
+
+Не показывай этот JSON пользователю — это служебные данные. Пиши только то, что пользователь должен видеть.
+
+После ~12-15 вопросов сделай краткое резюме профиля и предложи завершить интервью.`;
+}
+
+// ── API ──
+async function callClaude(userMessage) {
+  conversationHistory.push({ role: 'user', content: userMessage });
+
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-5',
+      max_tokens: 1024,
+      system: getSystemPrompt(),
+      messages: conversationHistory
+    })
+  });
+
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    throw new Error(err?.error?.message || `API error: ${response.status}`);
+  }
+  const data = await response.json();
+  const text = data.content?.[0]?.text || '';
+
+  // Extract profile update
+  const profileMatch = text.match(/\[PROFILE_UPDATE:(.*?)\]/s);
+  if (profileMatch) {
+    try {
+      const update = JSON.parse(profileMatch[1]);
+      mergeProfileData(update);
+    } catch(e) {}
+  }
+
+  // Clean text
+  const cleanText = text.replace(/\[PROFILE_UPDATE:.*?\]/s, '').trim();
+
+  conversationHistory.push({ role: 'assistant', content: cleanText });
+  return cleanText;
+}
+
+function mergeProfileData(update) {
+  ['skills','exp','soft','cond','psych','ctx'].forEach(key => {
+    if (update[key] && update[key].length) {
+      update[key].forEach(item => {
+        if (!profileData[key].includes(item)) profileData[key].push(item);
+      });
+    }
+  });
+  if (update.role_name && update.role_name.trim()) {
+    profileData.role_name = update.role_name.trim();
+    // Update nav vacancy name
+    const navVacancy = document.getElementById('nav-vacancy');
+    if (navVacancy) navVacancy.textContent = profileData.role_name;
+  }
+  renderProfile();
+}
+
+// ── UI ──
+function addAiMessage(text, animate = true) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg-ai';
+  div.innerHTML = `
+    <div class="ai-avatar">AI</div>
+    <div class="ai-bubble">${text.replace(/\n/g, '<br>')}</div>
+  `;
+  if (!animate) div.style.animation = 'none';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  messageCount++;
+  updateRoundTabs();
+}
+
+function addUserMessage(text) {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg-user';
+  div.innerHTML = `<div class="user-bubble">${text.replace(/\n/g, '<br>')}</div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg-ai typing' ;
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="ai-avatar">AI</div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function hideTyping() {
+  const el = document.getElementById('typing-indicator');
+  if (el) el.remove();
+}
+
+function setQuickReplies(replies) {
+  const qr = document.getElementById('quick-replies');
+  qr.innerHTML = '';
+  (replies || []).forEach(r => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = r;
+    btn.onclick = () => {
+      document.getElementById('user-input').value = r;
+      sendMessage();
+    };
+    qr.appendChild(btn);
+  });
+}
+
+function clearQuickReplies() {
+  document.getElementById('quick-replies').innerHTML = '';
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  document.getElementById('btn-send').disabled = !el.value.trim() || isWaiting;
+}
+
+// ── ROUNDS ──
+function updateRoundTabs() {
+  const rounds = [
+    { id: 'tab-1', threshold: 0 },
+    { id: 'tab-2', threshold: 4 },
+    { id: 'tab-3', threshold: 9 },
+    { id: 'tab-4', threshold: 13 },
+  ];
+  const aiMsgs = document.querySelectorAll('.msg-ai:not(.typing)').length;
+  let currentIdx = 0;
+  rounds.forEach((r, i) => { if (aiMsgs > r.threshold) currentIdx = i; });
+  rounds.forEach((r, i) => {
+    const tab = document.getElementById(r.id);
+    tab.classList.remove('active', 'done');
+    if (i < currentIdx) tab.classList.add('done');
+    else if (i === currentIdx) tab.classList.add('active');
+  });
+  if (currentRound !== currentIdx + 1) {
+    currentRound = currentIdx + 1;
+  }
+}
+
+// ── PROFILE PANEL ──
+function renderProfile() {
+  const map = [
+    { key: 'skills', emptyId: 'skills-empty', tagsId: 'skills-tags', blockId: 'block-skills', style: '' },
+    { key: 'exp',    emptyId: 'exp-empty',    tagsId: 'exp-tags',    blockId: 'block-exp',    style: 'neutral' },
+    { key: 'soft',   emptyId: 'soft-empty',   tagsId: 'soft-tags',   blockId: 'block-soft',   style: 'soft' },
+    { key: 'cond',   emptyId: 'cond-empty',   tagsId: 'cond-tags',   blockId: 'block-cond',   style: 'neutral' },
+    { key: 'psych',  emptyId: 'psych-empty',  tagsId: 'psych-tags',  blockId: 'block-psych',  style: 'soft' },
+    { key: 'ctx',    emptyId: 'ctx-empty',    tagsId: 'ctx-tags',    blockId: 'block-ctx',    style: 'neutral' },
+  ];
+
+  let filled = 0;
+  map.forEach(m => {
+    const items = profileData[m.key];
+    const empty = document.getElementById(m.emptyId);
+    const tags = document.getElementById(m.tagsId);
+    const block = document.getElementById(m.blockId);
+    if (items.length) {
+      empty.style.display = 'none';
+      block.classList.add('filled');
+      filled++;
+      tags.innerHTML = items.slice(0, 5).map(t =>
+        `<span class="pb-tag ${m.style}">${t}</span>`
+      ).join('');
+    } else {
+      empty.style.display = 'block';
+      tags.innerHTML = '';
+      block.classList.remove('filled');
+    }
+  });
+
+  const pct = Math.round((filled / 6) * 100);
+  document.getElementById('completeness-bar').style.width = pct + '%';
+  document.getElementById('completeness-pct').textContent = pct + '%';
+
+  const finishBtn = document.getElementById('btn-finish');
+  if (filled >= 3) finishBtn.classList.add('ready');
+}
+
+// ── SEND ──
+async function sendMessage() {
+  const input = document.getElementById('user-input');
+  const text = input.value.trim();
+  if (!text || isWaiting) return;
+
+  clearQuickReplies();
+  addUserMessage(text);
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('btn-send').disabled = true;
+  isWaiting = true;
+
+  showTyping();
+
+  try {
+    const reply = await callClaude(text);
+    hideTyping();
+    addAiMessage(reply);
+
+    // Suggest quick replies based on round
+    suggestQuickReplies();
+
+  } catch(e) {
+    hideTyping();
+    addAiMessage('Ошибка соединения с API. Проверьте ключ и попробуйте снова.');
+    console.error(e);
+  }
+
+  isWaiting = false;
+  document.getElementById('btn-send').disabled = false;
+  input.focus();
+}
+
+function suggestQuickReplies() {
+  const aiMsgs = document.querySelectorAll('.msg-ai:not(.typing)').length;
+  let replies = [];
+  if (aiMsgs <= 4) {
+    replies = ['Расскажу подробнее', 'Да, всё верно', 'Есть нюанс'];
+  } else if (aiMsgs <= 9) {
+    replies = ['Обязательный навык', 'Желательный', 'Не принципиально'];
+  } else if (aiMsgs <= 13) {
+    replies = ['Самостоятельная работа', 'В команде', 'Смешанный формат'];
+  } else {
+    replies = ['Да, можно завершать', 'Хочу уточнить ещё'];
+  }
+  setQuickReplies(replies);
+}
+
+// ── API CONNECT ──
+function connectApi() {
+  const key = document.getElementById('api-key-input').value.trim();
+  if (!key) { alert('Вставьте API ключ'); return; }
+  apiKey = key;
+
+  const setup = document.getElementById('api-setup');
+  setup.innerHTML = `
+    <div class="api-setup-icon">✅</div>
+    <div class="api-setup-text">
+      <p style="color:var(--success)">Claude API подключён</p>
+      <span>Диалог идёт в реальном времени</span>
+    </div>
+  `;
+  setup.style.borderColor = 'var(--success)';
+  setup.style.background = 'var(--success-bg)';
+
+  document.getElementById('user-input').disabled = false;
+  document.getElementById('btn-send').disabled = false;
+
+  // Start interview
+  startInterview();
+}
+
+async function startInterview() {
+  isWaiting = true;
+  showTyping();
+  try {
+    const opening = briefing.mode === 'task'
+      ? `Начни интервью с открытого вопроса о задаче или ситуации, которую нужно решить с помощью нового сотрудника.`
+      : `Начни структурированное интервью с первого раунда: уточни название роли и контекст команды.`;
+
+    const reply = await callClaude(opening);
+    hideTyping();
+    addAiMessage(reply);
+    suggestQuickReplies();
+  } catch(e) {
+    hideTyping();
+    addAiMessage('Не удалось начать интервью. Проверьте API ключ.');
+  }
+  isWaiting = false;
+}
+
+// ── DEMO MODE (no API key) ──
+function startDemoMode() {
+  document.getElementById('api-setup').style.display = 'none';
+  document.getElementById('user-input').disabled = false;
+
+  const demoMessages = [
+    { text: 'Расскажите о задаче своими словами — что нужно сделать, что сейчас тормозит?', qr: ['Нам нужно запустить новый API для мобильного приложения', 'Хотим автоматизировать процессы в команде', 'Растём и нужен человек на новое направление'] }
+  ];
+
+  addAiMessage(demoMessages[0].text);
+  setQuickReplies(demoMessages[0].qr);
+
+  // Demo: handle user input without API
+  window._demoMode = true;
+}
+
+// Override sendMessage for demo
+const _origSend = sendMessage;
+async function sendMessage() {
+  if (window._demoMode) {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text || isWaiting) return;
+    clearQuickReplies();
+    addUserMessage(text);
+    input.value = '';
+    input.style.height = 'auto';
+    isWaiting = true;
+    showTyping();
+    await new Promise(r => setTimeout(r, 1200));
+    hideTyping();
+
+    const demoReplies = [
+      { text: 'Понял. Это новая функциональность с нуля или доработка существующего? Есть дедлайн?', qr: ['С нуля, дедлайн 3 месяца', 'Доработка существующего', 'Дедлайн не определён'] },
+      { text: 'Хорошо. Кто сейчас работает над этим направлением — и чего конкретно не хватает?', qr: ['Один разработчик, не справляется', 'Нет нужной экспертизы', 'Все перегружены'] },
+      { text: 'Какой стек обязателен для этой роли? И что можно обучить на месте?', qr: ['Python + FastAPI обязательно', 'PostgreSQL + Redis', 'Go или Rust — плюс'] },
+      { text: 'Вы упомянули Python. Уточните направление — backend-сервисы, data-engineering или ML/AI?', qr: ['Backend (REST API, сервисы)', 'Data Engineering', 'Без разницы'] },
+      { text: 'Опишите идеального сотрудника для этой роли — человека, который идеально впишется в команду.', qr: ['Самостоятельный, не нужен надзор', 'Хороший коммуникатор', 'Любит технические вызовы'] },
+      { text: 'Последний блок — условия. Какая вилка зарплаты и формат работы?', qr: ['Remote, 4000-6000€', 'Гибрид, Рига', 'Офис, обсуждается'] },
+      { text: 'Отлично! Я собрал достаточно данных для формирования профиля. Хотите что-то уточнить или можем переходить к результатам?', qr: ['Перейти к профилю', 'Хочу уточнить ещё'] },
+    ];
+
+    const idx = Math.min(document.querySelectorAll('.msg-ai:not(.typing)').length - 1, demoReplies.length - 1);
+    const reply = demoReplies[idx];
+    addAiMessage(reply.text);
+    setQuickReplies(reply.qr);
+
+    // Update demo profile
+    const demoUpdates = [
+      {},
+      { ctx: ['Запуск с нуля', 'Дедлайн 3 месяца'] },
+      { ctx: ['1 разработчик в команде'] },
+      { skills: ['Python', 'FastAPI', 'PostgreSQL', 'Redis'] },
+      { skills: ['Python (backend)'], exp: ['Backend сервисы', 'REST API'] },
+      { soft: ['Самостоятельность', 'Технические вызовы'], psych: ['Инициативный'] },
+      { cond: ['Remote', '4000–6000€'] },
+    ];
+    if (demoUpdates[idx]) mergeProfileData(demoUpdates[idx]);
+
+    if (reply.text.includes('переходить к результатам')) {
+      document.getElementById('btn-finish').classList.add('ready');
+    }
+
+    isWaiting = false;
+    document.getElementById('btn-send').disabled = false;
+    return;
+  }
+  return _origSend();
+}
+
+// ── MISC ──
+function saveDraft() {
+  const btn = document.querySelector('.btn-save');
+  btn.textContent = 'Сохранено ✓';
+  btn.style.borderColor = 'var(--success)';
+  btn.style.color = 'var(--success)';
+  setTimeout(() => {
+    btn.textContent = 'Сохранить черновик';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+  }, 2000);
+}
+
+function goToProfile() {
+  window.location.href = 'yoffer-profile.html';
+}
+
+// ── INIT ──
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('user-input').disabled = true;
+  document.getElementById('btn-send').disabled = true;
+
+  // Add demo button
+  const row = document.querySelector('.api-input-row');
+  if (row) {
+    const demoBtn = document.createElement('button');
+    demoBtn.className = 'btn-api-connect';
+    demoBtn.textContent = 'Демо →';
+    demoBtn.style.marginLeft = '8px';
+    demoBtn.style.background = 'var(--text-secondary)';
+    demoBtn.onclick = startDemoMode;
+    row.appendChild(demoBtn);
+  }
+
+  renderProfile();
+});
+</script>
+</body>
+</html>

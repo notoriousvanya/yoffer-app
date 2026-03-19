@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YOFFER — Найдите нужного человека</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --purple: #6B4EFF;
+    --purple-light: #8B72FF;
+    --purple-soft: #F0EDFF;
+    --purple-mid: #E0D9FF;
+    --text-primary: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --bg: #F7F7FA;
+    --white: #FFFFFF;
+    --border: #E8E8F0;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'Manrope', sans-serif; background: var(--bg); color: var(--text-primary); overflow-x: hidden; }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: rgba(255,255,255,0.88); backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 48px; height: 64px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .nav-logo { font-size: 22px; font-weight: 800; color: var(--purple); letter-spacing: -0.5px; text-decoration: none; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .btn-ghost { padding: 8px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: 'Manrope',sans-serif; color: var(--text-primary); background: transparent; border: 1.5px solid var(--border); cursor: pointer; transition: all .2s; }
+  .btn-ghost:hover { border-color: var(--purple); color: var(--purple); }
+  .btn-nav-primary { padding: 8px 24px; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple); border: none; cursor: pointer; transition: all .2s; }
+  .btn-nav-primary:hover { background: var(--purple-light); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    padding: 130px 24px 80px; position: relative; overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0; pointer-events: none; overflow: hidden;
+  }
+  .blob { position: absolute; border-radius: 50%; filter: blur(72px); }
+  .blob-1 { width: 500px; height: 500px; background: #DDD6FF; top: -100px; left: -100px; opacity: 0.5; }
+  .blob-2 { width: 400px; height: 400px; background: #C7D9FF; top: 10%; right: -80px; opacity: 0.4; }
+  .blob-3 { width: 300px; height: 300px; background: #FFD6EE; bottom: 5%; left: 15%; opacity: 0.35; }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--white); border: 1.5px solid var(--purple-mid);
+    border-radius: 100px; padding: 6px 18px 6px 8px;
+    font-size: 13px; font-weight: 600; color: var(--purple);
+    margin-bottom: 36px; animation: fadeUp .6s ease both;
+  }
+  .badge-dot { width: 24px; height: 24px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; }
+
+  .hero h1 {
+    font-size: clamp(48px, 7.5vw, 92px); font-weight: 800;
+    line-height: 1.04; letter-spacing: -2.5px; max-width: 880px;
+    animation: fadeUp .7s .1s ease both;
+  }
+  .accent { color: var(--purple); }
+
+  .hero-sub {
+    margin-top: 28px; font-size: clamp(16px, 2vw, 20px);
+    color: var(--text-secondary); font-weight: 500;
+    max-width: 540px; line-height: 1.65;
+    animation: fadeUp .7s .2s ease both;
+  }
+
+  .hero-cta {
+    margin-top: 48px; display: flex; align-items: center; gap: 14px;
+    animation: fadeUp .7s .3s ease both;
+  }
+  .btn-hero {
+    padding: 17px 44px; border-radius: 14px; font-size: 16px; font-weight: 700;
+    font-family: 'Manrope',sans-serif; color: #fff; background: var(--purple);
+    border: none; cursor: pointer; transition: all .25s;
+    box-shadow: 0 8px 36px rgba(107,78,255,.38);
+  }
+  .btn-hero:hover { background: var(--purple-light); transform: translateY(-2px); box-shadow: 0 14px 48px rgba(107,78,255,.48); }
+  .btn-ghost-hero {
+    padding: 17px 32px; border-radius: 14px; font-size: 16px; font-weight: 600;
+    font-family: 'Manrope',sans-serif; color: var(--text-primary); background: var(--white);
+    border: 1.5px solid var(--border); cursor: pointer; transition: all .2s;
+  }
+  .btn-ghost-hero:hover { border-color: var(--purple); color: var(--purple); }
+
+  .hero-trust { margin-top: 44px; font-size: 13px; color: var(--text-muted); font-weight: 500; animation: fadeUp .7s .4s ease both; }
+  .hero-trust b { color: var(--text-primary); font-weight: 700; }
+
+  /* Hero chat card */
+  .hero-visual { margin-top: 72px; width: 100%; max-width: 820px; position: relative; animation: fadeUp .8s .5s ease both; }
+  .hero-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 22px; padding: 28px 32px; box-shadow: 0 24px 80px rgba(107,78,255,.1); text-align: left; }
+  .hcard-header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+  .ai-ava { width: 42px; height: 42px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .ai-name { font-size: 14px; font-weight: 700; }
+  .ai-status { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+  .cb { background: var(--purple-soft); border-radius: 4px 16px 16px 16px; padding: 13px 17px; font-size: 14px; color: var(--text-primary); line-height: 1.65; font-weight: 500; max-width: 78%; margin-bottom: 10px; }
+  .cb-user { background: var(--purple); border-radius: 16px 4px 16px 16px; padding: 13px 17px; font-size: 14px; color: #fff; line-height: 1.65; font-weight: 500; max-width: 72%; margin-left: auto; margin-bottom: 10px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .chip { background: var(--white); border: 1.5px solid var(--border); border-radius: 100px; padding: 7px 15px; font-size: 13px; font-weight: 600; color: var(--text-primary); cursor: pointer; transition: all .15s; }
+  .chip:hover { border-color: var(--purple); color: var(--purple); }
+
+  /* Floating badges */
+  .float { position: absolute; background: var(--white); border: 1.5px solid var(--border); border-radius: 14px; padding: 11px 15px; box-shadow: 0 8px 28px rgba(0,0,0,.08); font-size: 13px; font-weight: 600; }
+  .f1 { top: -18px; left: -52px; animation: float 4s ease-in-out infinite; }
+  .f2 { top: 38%; right: -72px; animation: float 4s 1.5s ease-in-out infinite; }
+  .f3 { bottom: -14px; left: 8%; animation: float 4s .8s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+  /* SECTIONS */
+  section { padding: 100px 48px; }
+  .s-label { font-size: 12px; font-weight: 700; color: var(--purple); letter-spacing: .08em; text-transform: uppercase; margin-bottom: 14px; }
+  .s-title { font-size: clamp(32px, 4vw, 52px); font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; max-width: 580px; }
+  .inner { max-width: 1200px; margin: 0 auto; }
+
+  /* HOW */
+  .how-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; margin-top: 56px; }
+  .how-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 28px 22px; transition: all .25s; opacity: 0; transform: translateY(28px); }
+  .how-card.vis { opacity: 1; transform: translateY(0); transition: opacity .5s ease, transform .5s ease; }
+  .how-card:hover { border-color: var(--purple); box-shadow: 0 8px 32px rgba(107,78,255,.1); transform: translateY(-4px); }
+  .how-num { font-size: 12px; font-weight: 700; color: var(--purple); margin-bottom: 14px; letter-spacing: .04em; }
+  .how-icon { width: 46px; height: 46px; border-radius: 13px; background: var(--purple-soft); display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px; }
+  .how-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; letter-spacing: -.3px; }
+  .how-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.65; font-weight: 500; }
+
+  /* FOR WHOM */
+  .for-section { background: var(--white); }
+  .for-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; margin-top: 56px; }
+  .for-card { border: 1.5px solid var(--border); border-radius: 20px; padding: 30px 26px; position: relative; overflow: hidden; transition: all .25s; opacity: 0; transform: translateY(28px); }
+  .for-card.vis { opacity: 1; transform: translateY(0); transition: opacity .5s ease, transform .5s ease; }
+  .for-card:hover { border-color: var(--purple); box-shadow: 0 12px 48px rgba(107,78,255,.12); transform: translateY(-4px); }
+  .for-card::after { content: ''; position: absolute; top: 0; right: 0; width: 110px; height: 110px; background: var(--purple-soft); border-radius: 0 20px 0 100%; opacity: .55; }
+  .for-tag { display: inline-block; background: var(--purple-soft); color: var(--purple); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; margin-bottom: 14px; }
+  .for-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.4px; }
+  .for-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; font-weight: 500; }
+  .for-card ul { margin-top: 14px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 7px; }
+  .for-card ul li { font-size: 13px; color: var(--text-secondary); font-weight: 500; display: flex; align-items: center; gap: 8px; }
+  .for-card ul li::before { content: ''; display: block; width: 5px; height: 5px; border-radius: 50%; background: var(--purple); flex-shrink: 0; }
+
+  /* MODES */
+  .modes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 56px; max-width: 860px; }
+  .mode-card { background: var(--white); border: 1.5px solid var(--border); border-radius: 20px; padding: 30px 26px; opacity: 0; transform: translateY(28px); }
+  .mode-card.vis { opacity: 1; transform: translateY(0); transition: opacity .5s ease, transform .5s ease; }
+  .mode-card.feat { border-color: var(--purple); background: linear-gradient(135deg,#FAFAFF 0%,#F0EDFF 100%); }
+  .mode-lbl { font-size: 11px; font-weight: 700; color: var(--purple); letter-spacing: .07em; text-transform: uppercase; margin-bottom: 10px; }
+  .mode-card h3 { font-size: 20px; font-weight: 800; margin-bottom: 10px; letter-spacing: -.4px; }
+  .mode-card p { font-size: 14px; color: var(--text-secondary); line-height: 1.7; font-weight: 500; }
+  .mode-rec { display: inline-block; margin-top: 14px; background: var(--purple); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 100px; }
+
+  /* CTA */
+  .cta-sec { background: var(--purple); padding: 100px 48px; text-align: center; position: relative; overflow: hidden; }
+  .cta-sec::before { content: ''; position: absolute; top: -120px; left: 50%; transform: translateX(-50%); width: 700px; height: 700px; background: radial-gradient(ellipse,rgba(255,255,255,.12) 0%,transparent 70%); }
+  .cta-sec h2 { font-size: clamp(32px,5vw,62px); font-weight: 800; color: #fff; letter-spacing: -1.5px; line-height: 1.1; max-width: 680px; margin: 0 auto 20px; position: relative; }
+  .cta-sec p { font-size: 18px; color: rgba(255,255,255,.72); font-weight: 500; margin-bottom: 44px; position: relative; }
+  .btn-cta { padding: 18px 52px; border-radius: 14px; font-size: 17px; font-weight: 700; font-family: 'Manrope',sans-serif; color: var(--purple); background: #fff; border: none; cursor: pointer; transition: all .25s; box-shadow: 0 8px 32px rgba(0,0,0,.15); position: relative; }
+  .btn-cta:hover { transform: translateY(-2px); box-shadow: 0 16px 48px rgba(0,0,0,.2); }
+
+  /* FOOTER */
+  footer { background: var(--white); border-top: 1px solid var(--border); padding: 60px 48px 40px; }
+  .footer-big { font-size: clamp(64px,12vw,128px); font-weight: 800; color: var(--purple); opacity: .07; letter-spacing: -4px; line-height: 1; margin-bottom: 40px; user-select: none; }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  .footer-logo { font-size: 18px; font-weight: 800; color: var(--purple); display: block; margin-bottom: 10px; }
+  .footer-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; font-weight: 500; }
+  .fc h4 { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+  .fc a { display: block; font-size: 14px; color: var(--text-secondary); font-weight: 500; text-decoration: none; margin-bottom: 9px; transition: color .15s; }
+  .fc a:hover { color: var(--purple); }
+  .footer-bottom { border-top: 1px solid var(--border); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; }
+  .footer-bottom p { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; font-weight: 500; transition: color .15s; }
+  .footer-links a:hover { color: var(--purple); }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+
+  @media(max-width:960px){
+    nav{padding:0 24px} section{padding:72px 24px}
+    .how-grid{grid-template-columns:1fr 1fr}
+    .for-grid{grid-template-columns:1fr}
+    .modes-grid{grid-template-columns:1fr}
+    .footer-grid{grid-template-columns:1fr 1fr;gap:32px}
+    .f1,.f2,.f3{display:none}
+  }
+  @media(max-width:600px){
+    .how-grid{grid-template-columns:1fr}
+    .hero-cta{flex-direction:column;width:100%}
+    .btn-hero,.btn-ghost-hero{width:100%}
+    .footer-grid{grid-template-columns:1fr}
+    .btn-ghost{display:none}
+    .footer-bottom{flex-direction:column;gap:12px;text-align:center}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="#" class="nav-logo">YOFFER</a>
+  <div class="nav-right">
+    <button class="btn-ghost" onclick="window.location.href='yoffer-register.html'">Войти</button>
+    <button class="btn-nav-primary" onclick="window.location.href='yoffer-register.html'">Зарегистрироваться</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+  </div>
+
+  <div class="hero-badge">
+    <div class="badge-dot">✦</div>
+    ИИ-подбор нового поколения
+  </div>
+
+  <h1>Найдите нужного<br><span class="accent">человека</span> — не резюме</h1>
+
+  <p class="hero-sub">Опишите задачу своими словами. ИИ составит точный профиль кандидата и подберёт лучшие совпадения из базы.</p>
+
+  <div class="hero-cta">
+    <button class="btn-hero" onclick="document.getElementById('cta').scrollIntoView({behavior:'smooth'})">Начать поиск →</button>
+    <button class="btn-ghost-hero" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">Как это работает</button>
+  </div>
+
+  <p class="hero-trust">Уже <b>1 200+</b> компаний нашли своих людей через YOFFER</p>
+
+  <div class="hero-visual">
+    <div class="float f1">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:50%;background:var(--purple-soft);display:flex;align-items:center;justify-content:center;font-size:13px">👤</div>
+        <div>
+          <div style="font-size:12px;color:var(--text-muted);font-weight:500">Совпадение</div>
+          <div style="font-size:18px;font-weight:800;color:var(--purple)">94%</div>
+        </div>
+      </div>
+    </div>
+    <div class="float f2">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;font-weight:500">Профиль готов</div>
+      <div style="font-size:13px;font-weight:700;color:var(--purple)">Python Backend · Senior</div>
+    </div>
+    <div class="float f3" style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:18px">⚡</span>
+      <div>
+        <div style="font-size:11px;color:var(--text-muted);font-weight:500">Время подбора</div>
+        <div style="font-size:13px;font-weight:700">~15 минут</div>
+      </div>
+    </div>
+
+    <div class="hero-card">
+      <div class="hcard-header">
+        <div class="ai-ava">AI</div>
+        <div>
+          <div class="ai-name">YOFFER AI</div>
+          <div class="ai-status">составляет профиль кандидата</div>
+        </div>
+      </div>
+      <div class="cb">Расскажите о задаче своими словами — что нужно сделать, что сейчас тормозит? Не думайте о требованиях к кандидату.</div>
+      <div class="cb-user">Нам нужно запустить новый API для мобильного приложения, один разработчик не справляется</div>
+      <div class="cb">Понял. Это новая функциональность с нуля или доработка существующего? Есть дедлайн?</div>
+      <div class="chips">
+        <div class="chip">С нуля, дедлайн 3 месяца</div>
+        <div class="chip">Доработка</div>
+        <div class="chip">Дедлайн не определён</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section id="how">
+  <div class="inner">
+    <div class="s-label">Как это работает</div>
+    <h2 class="s-title">Четыре шага до <span class="accent">нужного человека</span></h2>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">01</div>
+        <div class="how-icon">📋</div>
+        <h3>Опишите задачу</h3>
+        <p>Расскажите что нужно сделать — своими словами, без HR-терминологии. Или ответьте на вопросы ИИ по структуре.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">02</div>
+        <div class="how-icon">🤖</div>
+        <h3>ИИ составит профиль</h3>
+        <p>Система задаст уточняющие вопросы и сформирует точный цифровой профиль кандидата с навыками, опытом и психотипом.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">03</div>
+        <div class="how-icon">⚡</div>
+        <h3>Получите совпадения</h3>
+        <p>Алгоритм подберёт кандидатов из базы с процентом совпадения по каждому критерию. Только релевантные.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">04</div>
+        <div class="how-icon">🤝</div>
+        <h3>Выйдите на контакт</h3>
+        <p>Пригласите кандидата к диалогу прямо из кабинета. Все контакты и статусы — в одном месте.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOR WHOM -->
+<section class="for-section">
+  <div class="inner">
+    <div class="s-label">Для кого</div>
+    <h2 class="s-title">Подходит всем, кто <span class="accent">нанимает</span></h2>
+    <div class="for-grid">
+      <div class="for-card">
+        <div class="for-tag">HR-специалист</div>
+        <h3>Структура вместо хаоса</h3>
+        <p>Ведите все вакансии в одном кабинете. ИИ поможет сформулировать требования точнее, чем стандартный бриф.</p>
+        <ul>
+          <li>Структурированный опрос по блокам</li>
+          <li>История всех кандидатов</li>
+          <li>Поделиться профилем с командой</li>
+        </ul>
+      </div>
+      <div class="for-card">
+        <div class="for-tag">Руководитель отдела</div>
+        <h3>Опишите задачу — не вакансию</h3>
+        <p>Вы думаете задачами, а не HR-критериями. Расскажите что нужно сделать — ИИ сам выведет какой человек нужен.</p>
+        <ul>
+          <li>Режим свободного описания</li>
+          <li>Глубокие вопросы про команду</li>
+          <li>Профиль под вашу культуру</li>
+        </ul>
+      </div>
+      <div class="for-card">
+        <div class="for-tag">Владелец компании</div>
+        <h3>Быстро и без посредников</h3>
+        <p>Не тратьте время на объяснение требований HR. Сами опишите кого ищете — за 15 минут получите список кандидатов.</p>
+        <ul>
+          <li>Минимум времени на старте</li>
+          <li>Прозрачный мэтчинг</li>
+          <li>Полный контроль процесса</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODES -->
+<section>
+  <div class="inner">
+    <div class="s-label">Два режима работы</div>
+    <h2 class="s-title">Как вам <span class="accent">удобнее</span></h2>
+    <div class="modes-grid">
+      <div class="mode-card feat">
+        <div class="mode-lbl">Режим A</div>
+        <h3>Описать задачу</h3>
+        <p>Расскажите о ситуации свободно — ИИ сам задаст уточняющие вопросы и выведет профиль из контекста. Никаких форм.</p>
+        <span class="mode-rec">Рекомендуем для руководителей</span>
+      </div>
+      <div class="mode-card">
+        <div class="mode-lbl">Режим B</div>
+        <h3>Заполнить по критериям</h3>
+        <p>ИИ проведёт структурированный опрос по блокам: навыки, опыт, личность, условия. Чётко и по шагам.</p>
+        <div style="margin-top:14px;font-size:13px;color:var(--text-muted);font-weight:600">Подходит для HR-специалистов</div>
+      </div>
+    </div>
+    <p style="margin-top:20px;font-size:14px;color:var(--text-secondary);font-weight:500;max-width:480px;line-height:1.65">
+      Можно совместить: начните с задачи, ИИ сформирует черновик, затем уточните критерии по незаполненным блокам.
+    </p>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec" id="cta">
+  <div style="position:relative;z-index:1">
+    <h2>Начните поиск прямо сейчас</h2>
+    <p>Регистрация — 2 минуты. Первый профиль бесплатно.</p>
+    <button class="btn-cta" onclick="window.location.href='yoffer-register.html'">Начать поиск →</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-big">YOFFER</div>
+  <div class="footer-grid">
+    <div>
+      <span class="footer-logo">YOFFER</span>
+      <p class="footer-desc">ИИ-платформа для точного подбора сотрудников. Опишите задачу — найдём нужного человека.</p>
+    </div>
+    <div class="fc">
+      <h4>Продукт</h4>
+      <a href="#">Как это работает</a>
+      <a href="#">Тарифы</a>
+      <a href="#">Для кандидатов</a>
+    </div>
+    <div class="fc">
+      <h4>Компания</h4>
+      <a href="#">О нас</a>
+      <a href="#">Помощь</a>
+      <a href="#">Контакты</a>
+    </div>
+    <div class="fc">
+      <h4>Социальные сети</h4>
+      <a href="#">Telegram</a>
+      <a href="#">Instagram*</a>
+      <a href="#">LinkedIn</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 YOFFER. Все права защищены.</p>
+    <div class="footer-links">
+      <a href="#">Политика конфиденциальности</a>
+      <a href="#">Пользовательское соглашение</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const d = e.target.dataset.d || 0;
+      setTimeout(() => e.target.classList.add('vis'), d);
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.how-card, .for-card, .mode-card').forEach((el, i) => {
+  el.dataset.d = (i % 4) * 100;
+  obs.observe(el);
+});
+</script>
+</body>
+</html>
